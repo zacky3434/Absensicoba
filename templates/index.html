@@ -1,0 +1,2914 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fingerprint Absen Santri | PeTIK Jombang - YBM PLN</title>
+    <!-- Google Fonts: POPPINS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            800: '#112240',
+                            900: '#0A192F',
+                            950: '#061020'
+                        },
+                        pesantren: {
+                            50: '#ECFDF5',
+                            100: '#D1FAE5',
+                            500: '#10B981',
+                            600: '#059669',
+                            700: '#047857'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #F8FAFC;
+            color: #0A192F;
+            overflow-x: hidden;
+        }
+
+        /* =========================================================
+           1. ANIMASI TRANSISI LAYAR (SPLASH -> LOGIN -> DASHBOARD)
+           ========================================================= */
+        .screen-transition {
+            transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+                        visibility 0.65s;
+        }
+        .splash-hidden {
+            opacity: 0 !important;
+            transform: scale(1.06) translateY(-25px) !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+        }
+        .login-initial {
+            opacity: 0;
+            transform: translateY(30px) scale(0.98);
+            pointer-events: none;
+            visibility: hidden;
+        }
+        .login-active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+            visibility: visible;
+        }
+        .login-exit-to-dashboard {
+            opacity: 0 !important;
+            transform: scale(1.05) translateY(-35px) !important;
+            pointer-events: none !important;
+            visibility: hidden !important;
+        }
+        .dashboard-hidden {
+            opacity: 0;
+            transform: translateY(24px);
+        }
+        .dashboard-visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s,
+                        transform 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.04) translate(5px, -5px); }
+        }
+        .corner-circle {
+            animation: floatSlow 7s ease-in-out infinite;
+        }
+        .dorm-arch-header {
+            border-bottom-left-radius: 50% 24%;
+            border-bottom-right-radius: 50% 24%;
+        }
+
+        /* =========================================================
+           2. ANIMASI RADIAL MENU 4 ARAH (SESUAI FRAME 2)
+           ========================================================= */
+        .radial-menu-stage {
+            position: relative;
+            width: 340px;
+            height: 76px;
+            transition: height 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .radial-menu-stage.menu-open {
+            height: 230px;
+        }
+
+        .radial-center-btn {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 30;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .radial-node, .radial-arrow {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -50%) scale(0.3);
+            transition: all 0.48s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .radial-menu-stage.menu-open .node-tl {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-165px, -92px) scale(1);
+        }
+        .radial-menu-stage.menu-open .node-tr {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(35px, -92px) scale(1);
+            transition-delay: 0.04s;
+        }
+        .radial-menu-stage.menu-open .node-bl {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-165px, 38px) scale(1);
+            transition-delay: 0.08s;
+        }
+        .radial-menu-stage.menu-open .node-br {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(35px, 38px) scale(1);
+            transition-delay: 0.12s;
+        }
+
+        .radial-menu-stage.menu-open .arrow-tl {
+            opacity: 1;
+            transform: translate(-72px, -42px) scale(1);
+        }
+        .radial-menu-stage.menu-open .arrow-tr {
+            opacity: 1;
+            transform: translate(38px, -42px) scale(1);
+        }
+        .radial-menu-stage.menu-open .arrow-bl {
+            opacity: 1;
+            transform: translate(-72px, 16px) scale(1);
+        }
+        .radial-menu-stage.menu-open .arrow-br {
+            opacity: 1;
+            transform: translate(38px, 16px) scale(1);
+        }
+
+        @keyframes contentFadeIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .navbar-content-animate {
+            animation: contentFadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: #FFFFFF; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- ================================================================= -->
+    <!-- LAYAR 1: TAMPILAN AWAL / SPLASH SCREEN                            -->
+    <!-- ================================================================= -->
+    <div id="splashScreen" onclick="enterLoginScreenFromSplash()"
+         class="fixed inset-0 z-[70] bg-gradient-to-b from-slate-50 via-white to-pesantren-50/40 flex flex-col items-center justify-center p-6 cursor-pointer select-none overflow-hidden screen-transition">
+
+        <div class="corner-circle absolute -top-28 -left-28 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-br from-pesantren-500/25 via-pesantren-100 to-slate-200/60 border-2 border-pesantren-500/30 shadow-inner"></div>
+        <div class="corner-circle absolute -top-28 -right-28 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-bl from-navy-900/20 via-slate-200 to-pesantren-100/50 border-2 border-navy-900/20 shadow-inner" style="animation-delay: 1.5s;"></div>
+        <div class="corner-circle absolute -bottom-28 -left-28 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-navy-900/20 via-slate-200 to-pesantren-100/50 border-2 border-navy-900/20 shadow-inner" style="animation-delay: 2.5s;"></div>
+        <div class="corner-circle absolute -bottom-28 -right-28 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tl from-pesantren-500/25 via-pesantren-100 to-slate-200/60 border-2 border-pesantren-500/30 shadow-inner" style="animation-delay: 0.8s;"></div>
+
+        <div class="relative z-10 max-w-2xl w-full bg-white/95 backdrop-blur-md rounded-[2rem] shadow-2xl border-2 border-slate-200/90 p-8 sm:p-12 text-center flex flex-col items-center space-y-7">
+
+            <div class="inline-flex items-center gap-6 sm:gap-8 bg-slate-50 px-8 py-4 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col items-center">
+                    <svg class="w-20 h-11" viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="petikGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#0A192F"/>
+                                <stop offset="55%" stop-color="#059669"/>
+                                <stop offset="100%" stop-color="#10B981"/>
+                            </linearGradient>
+                            <linearGradient id="petikGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#F59E0B"/>
+                                <stop offset="50%" stop-color="#10B981"/>
+                                <stop offset="100%" stop-color="#0A192F"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M35 15C21 15 12 24 12 30C12 36 21 45 35 45C48 45 55 30 60 30C65 30 72 15 85 15C99 15 108 24 108 30C108 36 99 45 85 45C72 45 65 30 60 30C55 30 48 15 35 15Z"
+                              stroke="url(#petikGrad1)" stroke-width="8.5" stroke-linecap="round"/>
+                        <path d="M60 30C65 30 72 15 85 15C99 15 108 24 108 30C108 36 99 45 85 45"
+                              stroke="url(#petikGrad2)" stroke-width="8.5" stroke-linecap="round"/>
+                    </svg>
+                    <span class="text-xs font-extrabold tracking-tight text-navy-900 mt-1">PeTIK Jombang</span>
+                </div>
+
+                <div class="h-12 w-[2px] bg-slate-300"></div>
+
+                <div class="flex items-center gap-3">
+                    <svg class="w-12 h-12" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="14" y="14" width="36" height="36" rx="4" stroke="#059669" stroke-width="4.5"/>
+                        <rect x="14" y="14" width="36" height="36" rx="4" transform="rotate(45 32 32)" stroke="#0A192F" stroke-width="4.5"/>
+                        <circle cx="48" cy="16" r="5.5" fill="#F59E0B"/>
+                    </svg>
+                    <div class="text-left leading-tight">
+                        <p class="text-base font-extrabold text-navy-900 tracking-wide">YBM</p>
+                        <p class="text-base font-extrabold text-pesantren-600 tracking-wide">PLN</p>
+                        <p class="text-[10px] text-slate-600 font-semibold">Yayasan Baitul Maal</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pesantren-100 border border-pesantren-600/40 text-pesantren-700 text-xs sm:text-sm font-bold">
+                    <span class="w-2.5 h-2.5 rounded-full bg-pesantren-600 animate-ping"></span>
+                    <span>Sistem Informasi Presensi Biometrik Terpadu</span>
+                </div>
+                <h1 class="text-4xl sm:text-6xl font-extrabold text-navy-900 tracking-tight leading-tight">
+                    Fingerprint<br>
+                    <span class="text-pesantren-600">Absen Santri</span>
+                </h1>
+            </div>
+
+            <div>
+                <p class="text-sm sm:text-base font-bold text-navy-900 bg-slate-100 px-6 py-2.5 rounded-full border-2 border-slate-300 shadow-sm">
+                    Credit: Developed By <span class="text-pesantren-700 font-extrabold">Zacky</span>
+                </p>
+            </div>
+
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-xl bg-pesantren-50 border border-pesantren-500/40">
+                    <span class="text-xs sm:text-sm font-bold text-navy-900">
+                        👆 Klik di mana saja pada layar untuk melanjutkan
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- LAYAR 2: TAMPILAN LOGIN                                           -->
+    <!-- ================================================================= -->
+    <div id="loginScreen" class="fixed inset-0 z-50 bg-slate-100 flex flex-col items-center justify-start overflow-y-auto screen-transition login-initial">
+
+        <div class="relative w-full h-64 sm:h-76 dorm-arch-header overflow-hidden shadow-lg shrink-0 bg-navy-900">
+            <img id="loginDormPhotoImg"
+                 src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80"
+                 alt="Gambar Asrama PeTIK Jombang"
+                 class="w-full h-full object-cover object-center opacity-60 transition-transform duration-700 hover:scale-105">
+            <div class="absolute inset-0 bg-gradient-to-b from-navy-950/65 via-navy-900/55 to-navy-900/90"></div>
+
+            <button type="button" onclick="backToSplashScreen()"
+                class="absolute top-4 left-4 z-20 inline-flex items-center gap-1.5 bg-navy-900/80 hover:bg-pesantren-600 text-white text-xs font-semibold px-4 py-2 rounded-xl border border-white/30 shadow transition">
+                <span>← Tampilan Awal</span>
+            </button>
+
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pb-6">
+                <span class="px-4 py-1 rounded-full bg-pesantren-600/80 border border-pesantren-500 text-white text-xs font-bold tracking-wide uppercase mb-2 shadow">
+                    Pesantren Teknologi Informasi dan Komunikasi
+                </span>
+                <h2 class="text-white text-2xl sm:text-3xl font-extrabold tracking-wide drop-shadow-md">
+                    Asrama PeTIK II Jombang
+                </h2>
+                <p class="text-xs sm:text-sm text-pesantren-100 font-medium mt-1 max-w-lg drop-shadow">
+                    Jl. KH. Bisri Syansuri, Plosogeneng, Kec. Jombang, Kabupaten Jombang
+                </p>
+            </div>
+        </div>
+
+        <div class="relative z-10 w-full max-w-md px-4 -mt-12 pb-10">
+            <div class="bg-white rounded-3xl shadow-2xl border-2 border-slate-200 overflow-hidden">
+
+                <div class="p-6 bg-slate-50 flex items-center gap-4">
+                    <div class="w-20 h-20 rounded-2xl bg-pesantren-600 text-white flex flex-col items-center justify-center shrink-0 shadow-md border-2 border-pesantren-500">
+                        <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c-1.5 2-4 4-4 7h8c0-3-2.5-5-4-7z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 10h14v10H5V10z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 20v-5a3 3 0 016 0v5"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 20h18M4 7v13M20 7v13"/>
+                        </svg>
+                        <span class="text-[9px] font-bold uppercase tracking-wider mt-1 text-white">SIM-Pontren</span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="inline-flex items-center gap-1.5 text-navy-900 font-extrabold text-sm">
+                            <span>🔒 Portal Autentikasi Terpadu</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Silakan masuk menggunakan akun resmi <strong>Santri</strong>, <strong>Ustadz/Musyrif</strong>, atau <strong>Administrator Pondok</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                <hr class="border-slate-200">
+
+                <div class="p-6 space-y-5">
+                    <div>
+                        <p class="text-xs font-bold text-navy-900 mb-3">
+                            Pilih jalur akses pengguna sesuai peran Anda di pesantren:
+                        </p>
+                        <div class="grid grid-cols-3 gap-2.5">
+                            <button type="button" onclick="selectLoginRole('SANTRI')" id="tabLoginSantri"
+                                class="py-3 px-2 rounded-2xl text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1.5 border">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422A12.083 12.083 0 0112 20.055a12.083 12.083 0 01-6.16-9.477L12 14z"/>
+                                </svg>
+                                <span>Santri</span>
+                            </button>
+
+                            <button type="button" onclick="selectLoginRole('USTADZ')" id="tabLoginUstadz"
+                                class="py-3 px-2 rounded-2xl text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1.5 border">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                                <span>Ustadz</span>
+                            </button>
+
+                            <button type="button" onclick="selectLoginRole('ADMIN')" id="tabLoginAdmin"
+                                class="py-3 px-2 rounded-2xl text-xs font-bold transition-all flex flex-col items-center justify-center gap-1.5 border">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                                <span>Admin</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="px-3.5 py-2.5 rounded-xl bg-pesantren-50 border border-pesantren-500/40 flex items-center justify-between text-xs">
+                        <span id="loginRoleTitle" class="font-bold text-navy-900">Jalur Aktif: Administrator Pondok</span>
+                        <span id="loginRoleBadge" class="px-2.5 py-0.5 rounded-md bg-pesantren-600 text-white font-bold text-[10px]">ADMIN</span>
+                    </div>
+
+                    <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-navy-900 mb-1.5">Username Akun :</label>
+                            <input type="text" id="loginUsername" required placeholder="Masukkan username akun..."
+                                class="w-full rounded-xl border border-slate-300 bg-slate-50 focus:bg-white px-4 py-3 text-sm text-navy-900 focus:outline-none focus:border-pesantren-600 focus:ring-2 focus:ring-pesantren-500/20 transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-navy-900 mb-1.5">Password :</label>
+                            <input type="password" id="loginPassword" required placeholder="Masukkan password..."
+                                class="w-full rounded-xl border border-slate-300 bg-slate-50 focus:bg-white px-4 py-3 text-sm text-navy-900 focus:outline-none focus:border-pesantren-600 focus:ring-2 focus:ring-pesantren-500/20 transition">
+                        </div>
+
+                        <div id="loginErrorBox" class="hidden p-3 rounded-xl bg-red-50 border border-red-300 text-red-700 text-xs font-medium"></div>
+
+                        <button type="submit"
+                            class="w-full bg-navy-900 hover:bg-pesantren-600 text-white font-bold py-3.5 rounded-xl text-sm shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+                            <span>Tombol Login — Masuk ke Dashboard</span>
+                            <span>→</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- LAYAR 3: DASHBOARD UTAMA                                          -->
+    <!-- ================================================================= -->
+    <div id="mainAppWrapper" class="min-h-screen flex flex-col bg-slate-50 dashboard-hidden">
+
+        <header class="w-full bg-white border-b-2 border-slate-200 pt-3 pb-5 px-4 no-print">
+            <div class="max-w-6xl mx-auto space-y-3">
+
+                <div class="flex flex-wrap justify-between items-center gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-navy-900 text-white text-xs font-bold shadow-sm">
+                            <span>🕌 SIM-Pontren PeTIK Jombang</span>
+                        </span>
+                        <span id="activeUserBadgeTop" class="text-xs font-bold text-pesantren-700 bg-pesantren-50 border border-pesantren-500/40 px-3.5 py-1.5 rounded-xl">
+                            -
+                        </span>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="detectAccurateLocationAndPrayerTimes()" title="Perbarui GPS & Jadwal Sholat"
+                            class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-pesantren-50 text-navy-900 border border-slate-300 text-xs font-semibold transition">
+                            📍 Perbarui Lokasi GPS
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KARTU HERO KUBAH MASJID -->
+                <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-navy-950 via-navy-900 to-pesantren-700 text-white shadow-xl border-2 border-pesantren-500">
+                    <svg class="absolute inset-x-0 bottom-0 w-full h-full opacity-20 pointer-events-none" viewBox="0 0 1200 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 0,320 L 0,220 Q 120,140 240,220 Q 380,80 520,170 Q 600,10 680,170 Q 820,80 960,220 Q 1080,140 1200,220 L 1200,320 Z"
+                              fill="#10B981" />
+                    </svg>
+
+                    <div class="relative z-10 pt-5 pb-6 px-4 sm:px-8 flex flex-col items-center text-center space-y-3">
+                        <div class="inline-flex items-center gap-2 bg-navy-950/90 border-2 border-pesantren-500 px-5 py-2 rounded-full shadow-md">
+                            <span class="text-base">📍</span>
+                            <span id="accurateLocationText" class="text-xs sm:text-sm font-bold tracking-wide text-white">
+                                Mendeteksi lokasi akurat saat ini...
+                            </span>
+                        </div>
+
+                        <div class="w-full max-w-2xl bg-navy-950/60 backdrop-blur-sm border border-white/15 rounded-2xl p-3.5 space-y-2.5">
+                            <div class="flex flex-wrap items-center justify-center gap-2 text-xs">
+                                <span class="font-bold uppercase tracking-wider text-pesantren-100">
+                                    🕰️ Jam Waktu Sholat Lokasi Saat Ini
+                                </span>
+                                <span id="nextPrayerNotice" class="px-2.5 py-0.5 rounded-full bg-pesantren-600 text-white font-bold text-[11px]">
+                                    Memuat...
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-5 gap-2 text-xs">
+                                <div class="bg-navy-900 border border-pesantren-500/40 rounded-xl py-2 px-2 shadow-sm">
+                                    <p class="text-[11px] text-pesantren-100 font-medium">Subuh</p>
+                                    <p id="prayFajr" class="font-extrabold text-sm sm:text-base text-white mt-0.5">--:--</p>
+                                </div>
+                                <div class="bg-navy-900 border border-pesantren-500/40 rounded-xl py-2 px-2 shadow-sm">
+                                    <p class="text-[11px] text-pesantren-100 font-medium">Dzuhur</p>
+                                    <p id="prayDhuhr" class="font-extrabold text-sm sm:text-base text-white mt-0.5">--:--</p>
+                                </div>
+                                <div class="bg-navy-900 border border-pesantren-500/40 rounded-xl py-2 px-2 shadow-sm">
+                                    <p class="text-[11px] text-pesantren-100 font-medium">Ashar</p>
+                                    <p id="prayAsr" class="font-extrabold text-sm sm:text-base text-white mt-0.5">--:--</p>
+                                </div>
+                                <div class="bg-navy-900 border border-pesantren-500/40 rounded-xl py-2 px-2 shadow-sm">
+                                    <p class="text-[11px] text-pesantren-100 font-medium">Maghrib</p>
+                                    <p id="prayMaghrib" class="font-extrabold text-sm sm:text-base text-white mt-0.5">--:--</p>
+                                </div>
+                                <div class="bg-navy-900 border border-pesantren-500/40 rounded-xl py-2 px-2 shadow-sm">
+                                    <p class="text-[11px] text-pesantren-100 font-medium">Isya</p>
+                                    <p id="prayIsha" class="font-extrabold text-sm sm:text-base text-white mt-0.5">--:--</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-1 space-y-1">
+                            <div id="accurateClockText" class="text-3xl sm:text-4xl font-extrabold tracking-widest text-white drop-shadow">
+                                00:00:00 WIB
+                            </div>
+                            <p id="accurateDateText" class="text-xs sm:text-sm font-semibold text-pesantren-100">
+                                Memuat tanggal hari ini...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- ALERT BANNER: DETEKSI SANTRI HILANG / BOLOS BERUNTUN -->
+        <div id="missingStudentBanner" class="hidden bg-red-600 text-white px-4 py-3 shadow-md no-print">
+            <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2 text-sm font-semibold">
+                    <span>🚨 PERINGATAN OTOMATIS ("MISSING STUDENT" ALERT):</span>
+                    <span id="missingStudentText" class="font-normal"></span>
+                </div>
+                <span class="text-xs bg-white text-red-700 font-bold px-2.5 py-1 rounded-full">Notifikasi Darurat Dikirim ke Keamanan & Wali</span>
+            </div>
+        </div>
+
+        <!-- MENU RADIAL ANIMASI 4 ARAH + AREA KONTEN NAVBAR -->
+        <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4 no-print">
+
+                <div id="radialMenuContainer" class="radial-menu-stage select-none">
+                    <div class="radial-arrow arrow-tl text-navy-900 font-bold text-lg">↖</div>
+                    <div class="radial-arrow arrow-tr text-navy-900 font-bold text-lg">↗</div>
+                    <div class="radial-arrow arrow-bl text-navy-900 font-bold text-lg">↙</div>
+                    <div class="radial-arrow arrow-br text-navy-900 font-bold text-lg">↘</div>
+
+                    <button type="button" onclick="selectRadialNavItem(1)" id="radialBtn1"
+                        class="radial-node node-tl w-32 py-2.5 px-3 rounded-xl bg-navy-900 hover:bg-pesantren-600 text-white text-xs font-semibold shadow-lg border border-pesantren-500 transition">
+                        🏠 Beranda
+                    </button>
+
+                    <button type="button" onclick="selectRadialNavItem(2)" id="radialBtn2"
+                        class="radial-node node-tr w-32 py-2.5 px-3 rounded-xl bg-navy-900 hover:bg-pesantren-600 text-white text-xs font-semibold shadow-lg border border-pesantren-500 transition">
+                        🎓 Santri & Shift
+                    </button>
+
+                    <button type="button" onclick="toggleRadialMenu()" id="radialCenterButton"
+                        class="radial-center-btn px-6 py-3 rounded-2xl bg-pesantren-600 hover:bg-navy-900 text-white font-bold text-sm shadow-xl border-2 border-white ring-2 ring-pesantren-500 flex items-center gap-2 cursor-pointer">
+                        <span id="radialCenterIcon">☰</span>
+                        <span>Menu</span>
+                    </button>
+
+                    <button type="button" onclick="selectRadialNavItem(3)" id="radialBtn3"
+                        class="radial-node node-bl w-32 py-2.5 px-3 rounded-xl bg-navy-900 hover:bg-pesantren-600 text-white text-xs font-semibold shadow-lg border border-pesantren-500 transition">
+                        🧠 Konseling BK
+                    </button>
+
+                    <button type="button" onclick="selectRadialNavItem(4)" id="radialBtn4"
+                        class="radial-node node-br w-32 py-2.5 px-3 rounded-xl bg-navy-900 hover:bg-pesantren-600 text-white text-xs font-semibold shadow-lg border border-pesantren-500 transition">
+                        ⚙️ Akun & Sistem
+                    </button>
+                </div>
+
+                <div class="flex flex-col items-center md:items-end text-center md:text-right">
+                    <span class="text-[11px] uppercase tracking-wider text-slate-500 font-bold">Halaman Aktif saat ini:</span>
+                    <div class="inline-flex items-center gap-2 mt-1">
+                        <span id="currentNavSectionBadge" class="px-4 py-1.5 rounded-xl bg-navy-900 text-white font-bold text-xs shadow-sm">
+                            🏠 Beranda Utama
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">
+                        Klik tombol <strong>Menu</strong> di sebelah kiri untuk membuka cabang navigasi.
+                    </p>
+                </div>
+            </div>
+
+            <div id="navbarDynamicViewport" class="min-h-[420px] space-y-6">
+
+                <!-- RINGKASAN METRIK ATAS -->
+                <section id="metricsSummarySection" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 no-print">
+                    <div class="bg-navy-900 text-white p-5 rounded-2xl shadow-md border-l-4 border-pesantren-500">
+                        <p class="text-xs text-slate-300 uppercase font-medium">Total Santri & Akun</p>
+                        <h2 id="statTotalStudents" class="text-3xl font-bold mt-1">0</h2>
+                        <p class="text-xs text-pesantren-500 mt-2">Terdaftar Sidik Jari, PIN & Akun</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-pesantren-600">
+                        <p class="text-xs text-slate-500 uppercase font-medium">Log Kehadiran Tercatat</p>
+                        <h2 id="statTotalLogs" class="text-3xl font-bold text-navy-900 mt-1">0</h2>
+                        <p class="text-xs text-pesantren-600 font-medium mt-2">Anti-Passback & Dual-Auth Aktif</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-navy-900">
+                        <p class="text-xs text-slate-500 uppercase font-medium">Izin / Sakit & Inventaris</p>
+                        <h2 id="statLeavesLoans" class="text-3xl font-bold text-navy-900 mt-1">0 / 0</h2>
+                        <p class="text-xs text-slate-500 mt-2">Izin Aktif / Barang Dipinjam</p>
+                    </div>
+                    <div class="bg-pesantren-600 text-white p-5 rounded-2xl shadow-md">
+                        <p class="text-xs text-pesantren-100 uppercase font-medium">Notifikasi WA Terkirim</p>
+                        <h2 id="statWaSent" class="text-3xl font-bold mt-1">0</h2>
+                        <p class="text-xs text-pesantren-100 mt-2">Terhubung Official WhatsApp API</p>
+                    </div>
+                </section>
+
+                <!-- ===================================================== -->
+                <!-- ADMIN SUB-VIEW 1: BERANDA (GRAFIK, SCAN, IZIN, WA)    -->
+                <!-- ===================================================== -->
+                <div id="adminTabBeranda" class="hidden space-y-6 navbar-content-animate">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-navy-900 text-white px-6 py-4 flex flex-wrap justify-between items-center gap-3">
+                            <div>
+                                <h3 class="font-semibold text-base">📊 Visualisasi Analitik Kehadiran Bulanan Pesantren</h3>
+                                <p class="text-xs text-slate-300">Rekapitulasi komparasi per shift kegiatan & tren kedisiplinan mingguan</p>
+                            </div>
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                <span class="px-3 py-1 rounded-lg bg-pesantren-600 text-white font-semibold">
+                                    Tepat Waktu: <strong id="sumOnTime">0</strong>
+                                </span>
+                                <span class="px-3 py-1 rounded-lg bg-amber-500 text-navy-900 font-semibold">
+                                    Terlambat: <strong id="sumLate">0</strong>
+                                </span>
+                                <span class="px-3 py-1 rounded-lg bg-red-600 text-white font-semibold">
+                                    Alfa: <strong id="sumAlpha">0</strong>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                            <div class="lg:col-span-7 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                <h4 class="text-xs font-bold uppercase text-navy-900 mb-3">Perbandingan Kehadiran Bulanan per Shift Kegiatan</h4>
+                                <div class="relative h-64">
+                                    <canvas id="monthlyShiftChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-5 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                <h4 class="text-xs font-bold uppercase text-navy-900 mb-3">Tren Persentase Ketepatan Waktu (Minggu 1 - 4)</h4>
+                                <div class="relative h-64">
+                                    <canvas id="monthlyTrendChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-navy-900 text-white px-5 py-4 flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-semibold text-sm">Terminal Biometrik & Backup PIN</h3>
+                                    <p class="text-xs text-slate-300">Simulasi Mesin Fingerprint & Anti-Passback</p>
+                                </div>
+                                <span class="bg-pesantren-600 text-white text-xs px-2.5 py-1 rounded-md font-medium">ZKTeco / Edge</span>
+                            </div>
+                            <div class="p-5 space-y-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">Pilih Jadwal Shift Kegiatan</label>
+                                    <select id="scanShiftId" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:border-pesantren-600"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">Pilih Santri (ID Sidik Jari / NIS)</label>
+                                    <select id="scanStudentIdentifier" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:border-pesantren-600"></select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Metode Verifikasi</label>
+                                        <select id="scanAuthMode" onchange="togglePinInput()" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:border-pesantren-600">
+                                            <option value="FINGERPRINT">Sidik Jari (1:N)</option>
+                                            <option value="DUAL_VERIFICATION">Dual (Jari + PIN)</option>
+                                            <option value="PIN_BACKUP">Backup PIN Saja</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Jam Scan (Simulasi)</label>
+                                        <input type="time" id="scanTimeInput" value="04:25" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:border-pesantren-600">
+                                    </div>
+                                </div>
+                                <div id="pinInputWrapper" class="hidden">
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">Masukkan 6-Digit PIN Santri</label>
+                                    <input type="text" id="scanPinCode" placeholder="Contoh: 112233" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:border-pesantren-600">
+                                </div>
+
+                                <div class="flex gap-2 pt-1">
+                                    <button onclick="submitBiometricScan()" class="flex-1 bg-pesantren-600 hover:bg-pesantren-700 text-white font-semibold py-2.5 px-4 rounded-xl text-sm shadow transition">
+                                        👆 Scan Kehadiran
+                                    </button>
+                                    <button onclick="triggerAlphaSweep()" title="Tandai Alfa & Tambah Poin" class="bg-navy-900 hover:bg-navy-800 text-white font-medium py-2.5 px-3 rounded-xl text-xs transition">
+                                        Tandai Alfa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-navy-900 text-white px-5 py-4">
+                                <h3 class="font-semibold text-sm">Manajemen Izin & Poskestren</h3>
+                                <p class="text-xs text-slate-300">Pencatatan Sakit, Izin Keluar & Izin Pulang</p>
+                            </div>
+                            <div class="p-5 space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">Nama Santri</label>
+                                    <select id="leaveStudentId" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Kategori Izin</label>
+                                        <select id="leaveType" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                            <option value="SAKIT">Sakit (Poskestren)</option>
+                                            <option value="IZIN_PULANG">Izin Pulang</option>
+                                            <option value="IZIN_KELUAR">Izin Keluar Komplek</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Disetujui Oleh</label>
+                                        <input type="text" id="leaveApprover" placeholder="Nama Ustadz / Petugas" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Mulai Tanggal</label>
+                                        <input type="date" id="leaveStartDate" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Sampai Tanggal</label>
+                                        <input type="date" id="leaveEndDate" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">Keterangan / Diagnosa</label>
+                                    <input type="text" id="leaveReason" placeholder="Contoh: Istirahat rawat jalan Poskestren" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                </div>
+                                <button onclick="submitLeaveRequest()" class="w-full bg-pesantren-600 hover:bg-pesantren-700 text-white font-semibold py-2.5 rounded-xl text-sm transition">
+                                    Simpan Izin & Kirim WA ke Wali
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                            <div class="bg-pesantren-600 text-white px-5 py-4 flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-semibold text-sm">Gateway WhatsApp Official API</h3>
+                                    <p class="text-xs text-pesantren-100">Log Notifikasi Otomatis ke Wali Santri</p>
+                                </div>
+                                <span class="text-xs bg-navy-900 px-2.5 py-1 rounded-md font-semibold">LIVE</span>
+                            </div>
+                            <div id="waLogsContainer" class="p-4 space-y-2.5 overflow-y-auto max-h-80 flex-1 bg-pesantren-50/40"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================================================== -->
+                <!-- ADMIN SUB-VIEW 2: JADWAL SHIFT (CRUD) & DATA SANTRI   -->
+                <!-- ===================================================== -->
+                <div id="adminTabSantriShift" class="hidden space-y-6 navbar-content-animate">
+                    <!-- KARTU PENGATURAN JADWAL SHIFT + TABEL DAFTAR SHIFT (EDIT & HAPUS) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-navy-900 text-white px-6 py-4 flex flex-wrap justify-between items-center gap-2">
+                            <div>
+                                <h3 class="font-semibold text-base">⏰ Pengaturan & Daftar Jadwal Shift Kegiatan Pondok</h3>
+                                <p class="text-xs text-slate-300">Tambahkan jadwal baru atau klik "✏️ Edit Shift" / "🗑️ Hapus" untuk mengubah jam mulai, batas tepat waktu, dan poin pelanggaran</p>
+                            </div>
+                            <span id="shiftCountBadge" class="bg-pesantren-600 text-white text-xs px-3 py-1 rounded-full font-semibold">0 Shift Aktif</span>
+                        </div>
+
+                        <!-- Form Tambah Jadwal Shift Baru -->
+                        <form onsubmit="submitNewShift(event)" class="p-6 bg-slate-50/70 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-3 items-end">
+                            <div class="lg:col-span-2">
+                                <label class="block text-xs font-semibold text-navy-900 mb-1">Nama Kegiatan / Shift *</label>
+                                <input type="text" id="newShiftName" required placeholder="Contoh: Shalat Subuh Berjamaah"
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-navy-900 mb-1">Kategori</label>
+                                <select id="newShiftCategory" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                                    <option value="SHALAT">Shalat</option>
+                                    <option value="SEKOLAH">Sekolah</option>
+                                    <option value="HALAQAH">Halaqah</option>
+                                    <option value="CURFEW">Curfew Malam</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-navy-900 mb-1">Jam Mulai</label>
+                                <input type="time" id="newShiftStart" value="04:00" required class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-navy-900 mb-1">Batas Tepat Waktu</label>
+                                <input type="time" id="newShiftLimit" value="04:35" required class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-navy-900 mb-1">Jam Tutup</label>
+                                <input type="time" id="newShiftEnd" value="05:15" required class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-navy-900 mb-1">Poin Telat / Alfa</label>
+                                <div class="flex gap-1">
+                                    <input type="number" id="newShiftLatePts" value="3" min="0" title="Poin Terlambat" class="w-1/2 rounded-xl border border-slate-300 bg-white px-2 py-2 text-sm text-center">
+                                    <input type="number" id="newShiftAbsentPts" value="7" min="0" title="Poin Alfa" class="w-1/2 rounded-xl border border-slate-300 bg-white px-2 py-2 text-sm text-center">
+                                </div>
+                            </div>
+                            <div>
+                                <button type="submit" class="w-full bg-pesantren-600 hover:bg-pesantren-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs shadow transition">
+                                    + Simpan Shift
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- TABEL DAFTAR JADWAL SHIFT KEGIATAN (LENGKAP DENGAN TOMBOL EDIT & HAPUS) -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-slate-100 text-navy-900 border-b border-slate-200 text-xs uppercase">
+                                        <th class="py-3 px-4">Nama Kegiatan / Shift</th>
+                                        <th class="py-3 px-4">Kategori</th>
+                                        <th class="py-3 px-4">Jam Mulai</th>
+                                        <th class="py-3 px-4">Batas Tepat Waktu</th>
+                                        <th class="py-3 px-4">Jam Tutup</th>
+                                        <th class="py-3 px-4">Poin Pelanggaran (Telat / Alfa)</th>
+                                        <th class="py-3 px-4">Aksi Kelola</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="shiftsMasterTableBody" class="divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-pesantren-600 text-white px-6 py-4 flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-semibold text-base">➕ Tambah Santri Baru & Buat Akun Otomatis</h3>
+                                    <p class="text-xs text-pesantren-100">Otomatis membuat NIS, ID Sidik Jari, PIN 6-Digit, dan Akun Login Santri</p>
+                                </div>
+                                <span class="bg-navy-900 text-white text-xs px-3 py-1 rounded-lg font-semibold">Auto-Account</span>
+                            </div>
+                            <form onsubmit="submitNewStudent(event)" class="p-6 space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Nama Lengkap Santri *</label>
+                                        <input type="text" id="newStudentName" required placeholder="Contoh: Ahmad Fauzan"
+                                            oninput="autoSuggestUsername()"
+                                            class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:border-pesantren-600">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Kamar Asrama *</label>
+                                        <input type="text" id="newStudentDorm" required placeholder="Contoh: Asrama Abu Bakar 101"
+                                            class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:border-pesantren-600">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Kelas Sekolah *</label>
+                                        <input type="text" id="newStudentClass" required placeholder="Contoh: Kelas 10 IPA 1"
+                                            class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:border-pesantren-600">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Nama Orang Tua / Wali *</label>
+                                        <input type="text" id="newStudentParent" required placeholder="Contoh: Bpk. H. Sulaiman"
+                                            class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:border-pesantren-600">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Nomor WhatsApp Wali *</label>
+                                        <input type="text" id="newStudentWa" required placeholder="Contoh: +6281234567890"
+                                            class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:border-pesantren-600">
+                                    </div>
+                                </div>
+
+                                <div class="p-3.5 rounded-2xl bg-pesantren-50 border border-pesantren-500/40 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-bold text-navy-900 mb-1">Username Login (Otomatis)</label>
+                                        <input type="text" id="newStudentUsername" placeholder="Otomatis dari nama"
+                                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-mono">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-navy-900 mb-1">Password Default</label>
+                                        <input type="text" id="newStudentPassword" value="santri123"
+                                            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-mono">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-navy-900 mb-1">PIN 6-Digit Santri</label>
+                                        <div class="flex gap-1">
+                                            <input type="text" id="newStudentPin" maxlength="6" placeholder="Otomatis"
+                                                class="w-full rounded-xl border border-slate-300 bg-white px-2.5 py-2 text-xs font-mono">
+                                            <button type="button" onclick="generateRandomPinInto('newStudentPin')"
+                                                class="bg-navy-900 hover:bg-navy-800 text-white px-2.5 rounded-xl text-xs font-bold">
+                                                🎲
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="w-full bg-navy-900 hover:bg-pesantren-600 text-white font-bold py-3 rounded-xl text-sm shadow transition">
+                                    💾 Daftarkan Santri + Buat Akun & PIN Otomatis
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="lg:col-span-5 space-y-6">
+                            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div class="bg-navy-900 text-white px-6 py-4 flex justify-between items-center">
+                                    <div>
+                                        <h3 class="font-semibold text-sm">📥 Import Excel Data Santri (.xlsx)</h3>
+                                        <p class="text-xs text-slate-300">Unggah banyak santri sekaligus + buat akun otomatis</p>
+                                    </div>
+                                    <a href="/api/students/template-excel" class="bg-pesantren-600 hover:bg-pesantren-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition">
+                                        📄 Unduh Template
+                                    </a>
+                                </div>
+                                <div class="p-5 space-y-3">
+                                    <input type="file" id="excelFileInput" accept=".xlsx"
+                                        class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-pesantren-50 file:text-pesantren-700 hover:file:bg-pesantren-100 border border-slate-300 rounded-xl p-1.5">
+                                    <button type="button" onclick="submitExcelImport()" class="w-full bg-pesantren-600 hover:bg-pesantren-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
+                                        🚀 Upload & Import Data Santri Sekarang
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div class="bg-navy-900 text-white px-6 py-3.5 flex justify-between items-center">
+                                    <div>
+                                        <h3 class="font-semibold text-sm">🔐 Buat / Reset PIN Santri (Admin)</h3>
+                                        <p class="text-xs text-slate-300">Atur PIN 6-Digit untuk Dual-Verification</p>
+                                    </div>
+                                    <span class="bg-pesantren-600 text-white text-xs px-2.5 py-0.5 rounded font-semibold">PIN</span>
+                                </div>
+                                <div class="p-5 space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Pilih Santri</label>
+                                        <select id="adminPinStudentId" onchange="syncSelectedStudentPin('admin')" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></select>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="adminNewPinInput" maxlength="6" placeholder="6 digit angka"
+                                            class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm font-mono font-bold tracking-widest text-navy-900">
+                                        <button type="button" onclick="generateRandomPinInto('adminNewPinInput')"
+                                            class="bg-pesantren-600 hover:bg-pesantren-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition">
+                                            🎲 Acak
+                                        </button>
+                                    </div>
+                                    <button onclick="submitStudentPinUpdate('ADMIN')" class="w-full bg-navy-900 hover:bg-pesantren-600 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
+                                        🔐 Simpan PIN Santri
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TABEL DAFTAR SANTRI AKTIF + FITUR EDIT PROFIL & HAPUS SANTRI -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-navy-900 text-white px-6 py-4 flex flex-wrap justify-between items-center gap-2">
+                            <div>
+                                <h3 class="font-semibold text-base">🎓 Daftar Data Santri Terdaftar (Edit Profil & Hapus Santri)</h3>
+                                <p class="text-xs text-slate-300">Klik tombol "✏️ Edit Profil" untuk memperbarui biodata santri atau "🗑️ Hapus" untuk menghapus data</p>
+                            </div>
+                            <span id="studentTableCountBadge" class="bg-pesantren-600 text-white text-xs px-3 py-1 rounded-full font-semibold">0 Santri</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-slate-100 text-navy-900 border-b border-slate-200 text-xs uppercase">
+                                        <th class="py-3 px-4">NIS</th>
+                                        <th class="py-3 px-4">Nama Lengkap Santri</th>
+                                        <th class="py-3 px-4">Asrama & Kelas</th>
+                                        <th class="py-3 px-4">ID Sidik Jari & PIN</th>
+                                        <th class="py-3 px-4">Wali Santri (WA)</th>
+                                        <th class="py-3 px-4">Poin Disiplin</th>
+                                        <th class="py-3 px-4">Aksi Kelola</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsMasterTableBody" class="divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================================================== -->
+                <!-- ADMIN SUB-VIEW 3: KONSELING AI BK MANUAL & LOG ABSEN  -->
+                <!-- ===================================================== -->
+                <div id="adminTabKonselingBk" class="hidden space-y-6 navbar-content-animate">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-navy-900 text-white px-6 py-4 flex flex-wrap justify-between items-center gap-2">
+                            <div>
+                                <h3 class="font-semibold text-base">🧠 AI Predictive Early Warning System (Bimbingan Konseling)</h3>
+                                <p class="text-xs text-slate-300">Deteksi dini pergeseran pola kedisiplinan, keterlambatan Subuh/Curfew, & frekuensi sakit santri (Input Manual dari Awal)</p>
+                            </div>
+                            <div class="flex flex-wrap gap-2 no-print">
+                                <button onclick="clearAllBkHistory()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition">
+                                    🗑️ Kosongkan Riwayat BK
+                                </button>
+                                <a href="/api/reports/export-excel" class="bg-pesantren-600 hover:bg-pesantren-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition">
+                                    📥 Export Excel (.xlsx)
+                                </a>
+                                <button onclick="window.print()" class="bg-white text-navy-900 hover:bg-slate-100 text-xs font-semibold px-3.5 py-2 rounded-xl transition">
+                                    🖨️ Cetak PDF
+                                </button>
+                            </div>
+                        </div>
+
+                        <form onsubmit="submitManualBkRecord(event)" class="p-6 bg-pesantren-50/50 border-b border-slate-200 space-y-4 no-print">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+                                <div class="lg:col-span-2">
+                                    <label class="block text-xs font-bold text-navy-900 mb-1">Pilih Santri *</label>
+                                    <select id="bkStudentId" required class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-navy-900 mb-1">Telat Subuh/Curfew (x)</label>
+                                    <input type="number" id="bkLateCount" value="0" min="0" oninput="previewManualBkScore()"
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-navy-900 mb-1">Frekuensi Sakit (x)</label>
+                                    <input type="number" id="bkSakitCount" value="0" min="0" oninput="previewManualBkScore()"
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-navy-900 mb-1">Alfa Beruntun (x)</label>
+                                    <input type="number" id="bkAlfaCount" value="0" min="0" oninput="previewManualBkScore()"
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-navy-900 mb-1">Skor Risiko AI (0-100)</label>
+                                    <input type="number" step="0.1" id="bkCustomScore" value="0" min="0" max="100"
+                                        class="w-full rounded-xl border border-pesantren-500 bg-white px-3 py-2 text-sm font-bold text-navy-900">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                                <div>
+                                    <label class="block text-xs font-bold text-navy-900 mb-1">Indikator Pola Perilaku Terdeteksi (Manual)</label>
+                                    <input type="text" id="bkIndicatorsInput" placeholder="Contoh: Sering terlambat Subuh & mengantuk di kelas"
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-navy-900 mb-1">Rekomendasi Tindak Lanjut BK (Manual)</label>
+                                    <input type="text" id="bkRecommendationInput" placeholder="Contoh: Konseling Musyrif & evaluasi jam tidur"
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm">
+                                </div>
+                                <div class="flex gap-2">
+                                    <select id="bkLevelSelect" class="w-1/2 rounded-xl border border-slate-300 bg-white px-2.5 py-2 text-xs font-semibold">
+                                        <option value="AUTO">Status Otomatis</option>
+                                        <option value="AMAN (Stabil)">AMAN (Stabil)</option>
+                                        <option value="WASPADA (Pembinaan Musyrif)">WASPADA</option>
+                                        <option value="KRITIS (Panggil Konseling BK & Wali)">KRITIS</option>
+                                    </select>
+                                    <button type="submit" class="w-1/2 bg-navy-900 hover:bg-pesantren-600 text-white font-bold py-2.5 px-3 rounded-xl text-xs shadow transition">
+                                        + Tambah Catatan BK
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-slate-100 text-navy-900 border-b border-slate-200 text-xs uppercase">
+                                        <th class="py-3 px-4">Santri & Kamar</th>
+                                        <th class="py-3 px-4">PIN Aktif</th>
+                                        <th class="py-3 px-4">Skor Risiko AI</th>
+                                        <th class="py-3 px-4">Status Peringatan</th>
+                                        <th class="py-3 px-4">Indikator Pola Perilaku Terdeteksi</th>
+                                        <th class="py-3 px-4">Rekomendasi Tindak Lanjut BK</th>
+                                        <th class="py-3 px-4 no-print">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="aiEarlyWarningTable" class="divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-navy-900 text-white px-6 py-4 flex justify-between items-center">
+                            <h3 class="font-semibold text-sm">Log Kehadiran Real-Time & Riwayat Sinkronisasi</h3>
+                            <span class="text-xs text-pesantren-500 font-medium">Menampilkan 50 Transaksi Terakhir</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-slate-100 text-navy-900 border-b border-slate-200 text-xs uppercase">
+                                        <th class="py-3 px-4">Waktu Scan</th>
+                                        <th class="py-3 px-4">Nama Santri</th>
+                                        <th class="py-3 px-4">Shift / Kegiatan</th>
+                                        <th class="py-3 px-4">Metode</th>
+                                        <th class="py-3 px-4">Status</th>
+                                        <th class="py-3 px-4">Mode Sync</th>
+                                        <th class="py-3 px-4">Catatan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendanceTableBody" class="divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================================================== -->
+                <!-- VIEW PORTAL USTADZ                                    -->
+                <!-- ===================================================== -->
+                <div id="viewUstadz" class="hidden space-y-6 navbar-content-animate">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-navy-900 text-white px-6 py-4">
+                                <h3 class="font-semibold text-sm">📋 Presensi Lapangan / Outdoor</h3>
+                                <p class="text-xs text-slate-300">Input kehadiran manual saat kegiatan luar ruangan</p>
+                            </div>
+                            <div class="p-5 space-y-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">Kegiatan / Shift</label>
+                                    <select id="ustadzShiftId" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">Pilih Santri</label>
+                                    <select id="ustadzStudentNis" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">Catatan Ustadz Pembimbing</label>
+                                    <input type="text" id="ustadzNotes" placeholder="Contoh: Hadir halaqah lapangan timur" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                </div>
+                                <button onclick="submitUstadzOutdoorAttendance()" class="w-full bg-pesantren-600 hover:bg-pesantren-700 text-white font-semibold py-2.5 rounded-xl text-sm shadow transition">
+                                    ✔ Catat Kehadiran Manual
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-navy-900 text-white px-6 py-4 flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-semibold text-sm">🔐 Buat / Reset PIN Santri (Ustadz)</h3>
+                                    <p class="text-xs text-slate-300">Bantu santri membuat PIN 6-Digit darurat</p>
+                                </div>
+                                <span class="bg-pesantren-600 text-white text-xs px-2 py-0.5 rounded font-semibold">Akses Ustadz</span>
+                            </div>
+                            <div class="p-5 space-y-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">Pilih Santri Asrama</label>
+                                    <select id="ustadzPinStudentId" onchange="syncSelectedStudentPin('ustadz')" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">PIN 6-Digit Baru</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="ustadzNewPinInput" maxlength="6" placeholder="6 digit angka"
+                                            class="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm font-mono font-bold tracking-widest text-navy-900">
+                                        <button type="button" onclick="generateRandomPinInto('ustadzNewPinInput')"
+                                            class="bg-pesantren-600 hover:bg-pesantren-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition">
+                                            🎲 Acak
+                                        </button>
+                                    </div>
+                                </div>
+                                <button onclick="submitStudentPinUpdate('USTADZ')" class="w-full bg-navy-900 hover:bg-pesantren-600 text-white font-semibold py-2.5 rounded-xl text-sm shadow transition">
+                                    🔐 Simpan PIN Baru Santri
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-pesantren-600 text-white px-6 py-4">
+                                <h3 class="font-semibold text-sm">📦 Peminjaman Inventaris Kamar</h3>
+                                <p class="text-xs text-pesantren-100">Pencatatan fasilitas pondok yang dipinjam santri</p>
+                            </div>
+                            <div class="p-5 space-y-3">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Kode Barang</label>
+                                        <input type="text" id="invCode" placeholder="INV-001" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Lokasi</label>
+                                        <input type="text" id="invLocation" placeholder="Asrama / Kelas" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">Nama Barang / Fasilitas</label>
+                                    <input type="text" id="invName" placeholder="Contoh: Proyektor / Kunci Loker" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-navy-900 mb-1">Santri Peminjam</label>
+                                    <select id="invStudentId" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></select>
+                                </div>
+                                <button onclick="submitInventoryLoan()" class="w-full bg-navy-900 hover:bg-navy-800 text-white font-semibold py-2.5 rounded-xl text-sm transition">
+                                    Catat Peminjaman Barang
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-navy-900 text-white px-6 py-4">
+                            <h3 class="font-semibold text-sm">Daftar Inventaris Kamar & Kelas yang Dipinjam Santri</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-slate-100 text-navy-900 border-b border-slate-200 text-xs uppercase">
+                                        <th class="py-3 px-4">Kode</th>
+                                        <th class="py-3 px-4">Nama Barang</th>
+                                        <th class="py-3 px-4">Lokasi</th>
+                                        <th class="py-3 px-4">Peminjam</th>
+                                        <th class="py-3 px-4">Waktu Pinjam</th>
+                                        <th class="py-3 px-4">Status</th>
+                                        <th class="py-3 px-4">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryTableBody" class="divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================================================== -->
+                <!-- VIEW PORTAL SANTRI                                    -->
+                <!-- ===================================================== -->
+                <div id="viewSantri" class="hidden navbar-content-animate">
+                    <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border-4 border-navy-900 overflow-hidden">
+                        <div class="bg-navy-900 text-white p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-xs bg-pesantren-600 px-3 py-1 rounded-full font-semibold">Portal Santri & Wali Santri</span>
+                            </div>
+                            <label class="block text-xs text-slate-300 mb-1">Data Profil Santri:</label>
+                            <select id="parentChildSelect" onchange="renderSantriPortal()" class="w-full rounded-xl bg-navy-800 text-white border border-pesantren-500 px-3 py-2.5 text-sm font-semibold"></select>
+                        </div>
+
+                        <div id="parentPortalContent" class="p-6 space-y-5"></div>
+                    </div>
+                </div>
+
+                <!-- ===================================================== -->
+                <!-- SUB-VIEW 4: PENGATURAN AKUN & GANTI FOTO ASRAMA PeTIK -->
+                <!-- ===================================================== -->
+                <div id="viewSettings" class="hidden space-y-6 navbar-content-animate">
+                    <div class="bg-navy-900 text-white p-6 rounded-2xl border-l-4 border-pesantren-500 flex flex-wrap justify-between items-center gap-4">
+                        <div>
+                            <span class="text-xs bg-pesantren-600 px-3 py-1 rounded-full font-semibold">Pusat Kredensial, Foto Asrama & Sesi</span>
+                            <h2 class="text-xl font-bold mt-2">⚙️ Pengaturan Sistem, Foto Asrama PeTIK, & Informasi Akun</h2>
+                            <p class="text-xs text-slate-300 mt-1">
+                                Ubah foto gedung Asrama PeTIK Jombang pada halaman Login, kelola seluruh Username & Password, atau beralih akun.
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="resetAllSystemData()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-3 rounded-xl text-xs shadow transition">
+                                🗑️ Kosongkan Semua Data (Reset)
+                            </button>
+                            <button onclick="showFullLoginScreen()" class="bg-pesantren-600 hover:bg-pesantren-700 text-white font-bold px-5 py-3 rounded-xl text-xs shadow-lg transition">
+                                🔐 Buka Layar Login Utama
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-pesantren-600 text-white px-6 py-4 flex flex-wrap justify-between items-center gap-2">
+                            <div>
+                                <h3 class="font-semibold text-base">🖼️ Pengaturan Foto Gedung Asrama PeTIK Jombang (Halaman Login)</h3>
+                                <p class="text-xs text-pesantren-100">Unggah foto gedung asrama dari perangkat Anda atau tempelkan URL gambar internet</p>
+                            </div>
+                            <span class="bg-navy-900 text-white text-xs px-3 py-1 rounded-lg font-semibold">Khusus Admin</span>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                            <div class="lg:col-span-5">
+                                <p class="text-xs font-bold text-navy-900 mb-2">Pratinjau Foto Asrama Saat Ini:</p>
+                                <div class="relative h-44 w-full rounded-2xl overflow-hidden border-2 border-navy-900 shadow-md bg-navy-900">
+                                    <img id="settingsDormPhotoPreview"
+                                         src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80"
+                                         alt="Preview Asrama PeTIK Jombang"
+                                         class="w-full h-full object-cover">
+                                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-950/90 to-transparent p-3">
+                                        <p class="text-xs font-bold text-white">Asrama PeTIK II Jombang</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-7 space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-navy-900 mb-1.5">Opsi 1: Upload File Foto Asrama dari Komputer / HP (.jpg, .png, .webp)</label>
+                                    <div class="flex flex-wrap sm:flex-nowrap gap-2">
+                                        <input type="file" id="dormPhotoFileInput" accept="image/*"
+                                            class="block w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-pesantren-50 file:text-pesantren-700 hover:file:bg-pesantren-100 border border-slate-300 rounded-xl p-1.5">
+                                        <button type="button" onclick="uploadDormPhotoFile()"
+                                            class="bg-pesantren-600 hover:bg-pesantren-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow shrink-0 transition">
+                                            📤 Upload & Pasang Foto
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-navy-900 mb-1.5">Opsi 2: Gunakan URL Gambar dari Internet</label>
+                                    <div class="flex flex-wrap sm:flex-nowrap gap-2">
+                                        <input type="url" id="dormPhotoUrlInput" placeholder="https://contoh-web.com/foto-asrama-petik.jpg"
+                                            class="flex-1 rounded-xl border border-slate-300 px-3.5 py-2 text-xs text-navy-900 focus:outline-none focus:border-pesantren-600">
+                                        <button type="button" onclick="saveDormPhotoUrl()"
+                                            class="bg-navy-900 hover:bg-pesantren-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow shrink-0 transition">
+                                            🔗 Simpan URL Foto
+                                        </button>
+                                        <button type="button" onclick="resetDefaultDormPhoto()"
+                                            class="bg-slate-200 hover:bg-slate-300 text-navy-900 font-semibold px-3 py-2 rounded-xl text-xs shrink-0 transition">
+                                            Reset Default
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="bg-navy-900 text-white px-6 py-4 flex flex-wrap justify-between items-center gap-2">
+                                <div>
+                                    <h3 class="font-semibold text-sm">Daftar Informasi Username & Password Akun</h3>
+                                    <p class="text-xs text-slate-300">Klik "Masuk Login" untuk langsung beralih ke akun tersebut</p>
+                                </div>
+                                <button onclick="togglePasswordVisibility()" class="bg-navy-800 hover:bg-pesantren-600 border border-pesantren-500 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition">
+                                    👁️ Tampilkan / Sembunyikan Password
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse text-sm">
+                                    <thead>
+                                        <tr class="bg-slate-100 text-navy-900 border-b border-slate-200 text-xs uppercase">
+                                            <th class="py-3 px-4">Peran</th>
+                                            <th class="py-3 px-4">Nama Lengkap & Jabatan</th>
+                                            <th class="py-3 px-4">Username</th>
+                                            <th class="py-3 px-4">Password</th>
+                                            <th class="py-3 px-4">Aksi Cepat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="accountsTableBody" class="divide-y divide-slate-200"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 space-y-6">
+                            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div class="bg-pesantren-600 text-white px-6 py-4">
+                                    <h3 class="font-semibold text-sm">➕ Tambah Akun Ustadz / Staff Baru</h3>
+                                    <p class="text-xs text-pesantren-100">Buat akun akses portal Ustadz atau Admin dari awal</p>
+                                </div>
+                                <form onsubmit="submitCreateStaffAccount(event)" class="p-5 space-y-3">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-navy-900 mb-1">Peran Akun</label>
+                                            <select id="newStaffRole" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                                <option value="USTADZ">Ustadz / Musyrif</option>
+                                                <option value="ADMIN">Admin Creator</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-navy-900 mb-1">Jabatan / Amanah</label>
+                                            <input type="text" id="newStaffTitle" required placeholder="Musyrif Asrama" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Nama Lengkap Ustadz / Staff</label>
+                                        <input type="text" id="newStaffFullName" required placeholder="Contoh: Ust. Ahmad Fauzi" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-navy-900 mb-1">Username Login</label>
+                                            <input type="text" id="newStaffUsername" required placeholder="ustadz_fauzi" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-mono">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-navy-900 mb-1">Password</label>
+                                            <input type="text" id="newStaffPassword" required value="ustadz123" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-mono">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="w-full bg-navy-900 hover:bg-pesantren-600 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
+                                        + Buat Akun Ustadz / Staff
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                                <div class="bg-navy-900 text-white px-6 py-4">
+                                    <h3 class="font-semibold text-sm">✏️ Edit Username & Password Akun</h3>
+                                    <p class="text-xs text-slate-300">Perbarui kredensial login akun yang dipilih</p>
+                                </div>
+                                <form onsubmit="submitAccountUpdate(event)" class="p-5 space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Pilih Akun</label>
+                                        <select id="editAccountSelect" onchange="populateEditAccountForm()" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-navy-900 mb-1">Nama Pengguna</label>
+                                        <input type="text" id="editAccountFullName" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-semibold text-navy-900 mb-1">Username Baru</label>
+                                            <input type="text" id="editAccountUsername" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-mono">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-semibold text-navy-900 mb-1">Password Baru</label>
+                                            <input type="text" id="editAccountPassword" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-mono">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="w-full bg-pesantren-600 hover:bg-pesantren-700 text-white font-bold py-2.5 rounded-xl text-xs shadow transition">
+                                        💾 Simpan Perubahan Akun
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- MODAL EDIT JADWAL SHIFT KEGIATAN (BARU)                           -->
+    <!-- ================================================================= -->
+    <div id="editShiftModal" class="fixed inset-0 z-[75] hidden bg-navy-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl border-2 border-pesantren-500 max-w-lg w-full overflow-hidden">
+            <div class="bg-navy-900 text-white px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-base">⏰ Edit Jadwal Shift Kegiatan</h3>
+                    <p class="text-xs text-pesantren-400">Ubah jam mulai, batas tepat waktu, jam tutup, dan poin pelanggaran</p>
+                </div>
+                <button type="button" onclick="closeEditShiftModal()" class="text-slate-300 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            <form onsubmit="submitEditShift(event)" class="p-6 space-y-4">
+                <input type="hidden" id="editShiftIdInput">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-navy-900 mb-1">Nama Kegiatan / Shift *</label>
+                        <input type="text" id="editShiftNameInput" required
+                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-pesantren-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-navy-900 mb-1">Kategori *</label>
+                        <select id="editShiftCategoryInput" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:border-pesantren-600">
+                            <option value="SHALAT">Shalat</option>
+                            <option value="SEKOLAH">Sekolah</option>
+                            <option value="HALAQAH">Halaqah</option>
+                            <option value="CURFEW">Curfew Malam</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-navy-900 mb-1">Jam Mulai *</label>
+                        <input type="time" id="editShiftStartInput" required
+                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-pesantren-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-navy-900 mb-1">Batas Tepat Waktu *</label>
+                        <input type="time" id="editShiftLimitInput" required
+                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-pesantren-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-navy-900 mb-1">Jam Tutup *</label>
+                        <input type="time" id="editShiftEndInput" required
+                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-pesantren-600">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-pesantren-50 border border-pesantren-500/40">
+                    <div>
+                        <label class="block text-xs font-bold text-navy-900 mb-1">Poin Pelanggaran Terlambat</label>
+                        <input type="number" id="editShiftLatePtsInput" min="0" required
+                            class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-bold text-navy-900">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-navy-900 mb-1">Poin Pelanggaran Alfa (Mangkir)</label>
+                        <input type="number" id="editShiftAbsentPtsInput" min="0" required
+                            class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-bold text-red-600">
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeEditShiftModal()"
+                        class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-navy-900 text-xs font-semibold transition">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-5 py-2.5 rounded-xl bg-pesantren-600 hover:bg-pesantren-700 text-white text-xs font-bold shadow transition">
+                        💾 Simpan Perubahan Shift
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- MODAL EDIT PROFIL SANTRI                                          -->
+    <!-- ================================================================= -->
+    <div id="editStudentModal" class="fixed inset-0 z-[75] hidden bg-navy-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl border-2 border-pesantren-500 max-w-lg w-full overflow-hidden">
+            <div class="bg-navy-900 text-white px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-base">✏️ Edit Profil Data Santri</h3>
+                    <p id="editStudentModalNis" class="text-xs text-pesantren-400 font-mono">NIS: -</p>
+                </div>
+                <button type="button" onclick="closeEditStudentModal()" class="text-slate-300 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            <form onsubmit="submitEditStudentProfile(event)" class="p-6 space-y-4">
+                <input type="hidden" id="editStudentIdInput">
+                <div>
+                    <label class="block text-xs font-bold text-navy-900 mb-1">Nama Lengkap Santri *</label>
+                    <input type="text" id="editStudentNameInput" required
+                        class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-pesantren-600">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-navy-900 mb-1">Kamar Asrama *</label>
+                        <input type="text" id="editStudentDormInput" required
+                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-pesantren-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-navy-900 mb-1">Kelas Sekolah *</label>
+                        <input type="text" id="editStudentClassInput" required
+                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-pesantren-600">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-navy-900 mb-1">Nama Orang Tua / Wali *</label>
+                        <input type="text" id="editStudentParentInput" required
+                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-pesantren-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-navy-900 mb-1">Nomor WhatsApp Wali *</label>
+                        <input type="text" id="editStudentWaInput" required
+                            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-pesantren-600">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-navy-900 mb-1">Total Poin Pelanggaran / Disiplin</label>
+                    <input type="number" id="editStudentPointsInput" min="0" value="0"
+                        class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-pesantren-600">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeEditStudentModal()"
+                        class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-navy-900 text-xs font-semibold transition">
+                        Batal
+                    </button>
+                    <button type="submit"
+                        class="px-5 py-2.5 rounded-xl bg-pesantren-600 hover:bg-pesantren-700 text-white text-xs font-bold shadow transition">
+                        💾 Simpan Perubahan Profil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastBox" class="fixed bottom-5 right-5 hidden bg-navy-900 text-white border-l-4 border-pesantren-500 px-5 py-3.5 rounded-xl shadow-2xl text-sm font-medium z-[80]"></div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const DEFAULT_DORM_PHOTO = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80";
+        let appState = { dorm_photo_url: DEFAULT_DORM_PHOTO, accounts: [], students: [], shifts: [], logs: [], leaves: [], loans: [], wa_logs: [], bk_records: [], missing_students: [], analytics: null };
+        let selectedLoginRole = 'ADMIN';
+        let currentUser = null;
+        let showPasswordsInTable = true;
+        let isOfflineMode = false;
+        let offlineQueue = JSON.parse(localStorage.getItem('sim_pontren_offline_queue') || '[]');
+        let shiftChartInstance = null;
+        let trendChartInstance = null;
+        let isRadialMenuOpen = false;
+        let activePrayerTimings = null;
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toastBox');
+            toast.textContent = msg;
+            toast.className = `fixed bottom-5 right-5 ${isError ? 'bg-red-700 border-white' : 'bg-navy-900 border-pesantren-500'} text-white border-l-4 px-5 py-3.5 rounded-xl shadow-2xl text-sm font-medium z-[80]`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 4500);
+        }
+
+        // =========================================================
+        // 1. JAM AKURAT, TANGGAL AKURAT, LOKASI GPS & WAKTU SHOLAT
+        // =========================================================
+        function startRealtimeAccurateClock() {
+            function updateClock() {
+                const now = new Date();
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                const ss = String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('accurateClockText').textContent = `${hh}:${mm}:${ss} WIB`;
+
+                const dateFormatter = new Intl.DateTimeFormat('id-ID', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+                let hijriStr = '';
+                try {
+                    hijriStr = ' • ' + new Intl.DateTimeFormat('id-ID-u-ca-islamic', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    }).format(now);
+                } catch (e) {}
+
+                document.getElementById('accurateDateText').textContent = dateFormatter.format(now) + hijriStr;
+                updateNextPrayerHighlight(hh + ':' + mm);
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        function updateNextPrayerHighlight(currentHHMM) {
+            if (!activePrayerTimings) return;
+            const order = [
+                { key: 'Fajr', name: 'Subuh', time: activePrayerTimings.Fajr },
+                { key: 'Dhuhr', name: 'Dzuhur', time: activePrayerTimings.Dhuhr },
+                { key: 'Asr', name: 'Ashar', time: activePrayerTimings.Asr },
+                { key: 'Maghrib', name: 'Maghrib', time: activePrayerTimings.Maghrib },
+                { key: 'Isha', name: 'Isya', time: activePrayerTimings.Isha }
+            ];
+            let nextFound = order.find(p => p.time > currentHHMM);
+            if (!nextFound) nextFound = { name: 'Subuh Besok', time: activePrayerTimings.Fajr };
+            document.getElementById('nextPrayerNotice').textContent = `Berikutnya: ${nextFound.name} ${nextFound.time}`;
+        }
+
+        async function fetchPrayerTimesByCoords(lat, lon, locationLabel) {
+            document.getElementById('accurateLocationText').textContent = locationLabel;
+            try {
+                const today = new Date();
+                const dd = String(today.getDate()).padStart(2, '0');
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const yyyy = today.getFullYear();
+                const res = await fetch(`https://api.aladhan.com/v1/timings/${dd}-${mm}-${yyyy}?latitude=${lat}&longitude=${lon}&method=20`);
+                const json = await res.json();
+                if (json && json.data && json.data.timings) {
+                    const t = json.data.timings;
+                    activePrayerTimings = {
+                        Fajr: t.Fajr.slice(0, 5),
+                        Dhuhr: t.Dhuhr.slice(0, 5),
+                        Asr: t.Asr.slice(0, 5),
+                        Maghrib: t.Maghrib.slice(0, 5),
+                        Isha: t.Isha.slice(0, 5)
+                    };
+                    document.getElementById('prayFajr').textContent = activePrayerTimings.Fajr;
+                    document.getElementById('prayDhuhr').textContent = activePrayerTimings.Dhuhr;
+                    document.getElementById('prayAsr').textContent = activePrayerTimings.Asr;
+                    document.getElementById('prayMaghrib').textContent = activePrayerTimings.Maghrib;
+                    document.getElementById('prayIsha').textContent = activePrayerTimings.Isha;
+                }
+            } catch (err) {
+                activePrayerTimings = { Fajr: '04:08', Dhuhr: '11:36', Asr: '14:58', Maghrib: '17:46', Isha: '18:59' };
+                document.getElementById('prayFajr').textContent = activePrayerTimings.Fajr;
+                document.getElementById('prayDhuhr').textContent = activePrayerTimings.Dhuhr;
+                document.getElementById('prayAsr').textContent = activePrayerTimings.Asr;
+                document.getElementById('prayMaghrib').textContent = activePrayerTimings.Maghrib;
+                document.getElementById('prayIsha').textContent = activePrayerTimings.Isha;
+            }
+        }
+
+        function detectAccurateLocationAndPrayerTimes() {
+            const defaultLat = -7.5361;
+            const defaultLon = 112.2384;
+
+            if (!navigator.geolocation) {
+                fetchPrayerTimesByCoords(defaultLat, defaultLon, "Plosogeneng, Kabupaten Jombang, Jawa Timur");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    let locName = `Koordinat Akurat (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+                    try {
+                        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=14`);
+                        const geoData = await geoRes.json();
+                        if (geoData && geoData.address) {
+                            const a = geoData.address;
+                            const area = a.village || a.suburb || a.town || a.city_district || a.county || '';
+                            const city = a.city || a.regency || a.county || a.state || '';
+                            const prov = a.state || '';
+                            locName = [area, city, prov].filter(Boolean).join(', ');
+                        }
+                    } catch (e) {}
+                    fetchPrayerTimesByCoords(lat, lon, locName);
+                },
+                () => {
+                    fetchPrayerTimesByCoords(defaultLat, defaultLon, "Plosogeneng, Jombang, Jawa Timur (Lokasi Pondok)");
+                },
+                { enableHighAccuracy: true, timeout: 6000 }
+            );
+        }
+
+        // =========================================================
+        // 2. ANIMASI MENU RADIAL 4 ARAH (KLIK MENU <-> KEMBALI KE MENU)
+        // =========================================================
+        function toggleRadialMenu() {
+            isRadialMenuOpen = !isRadialMenuOpen;
+            const container = document.getElementById('radialMenuContainer');
+            const icon = document.getElementById('radialCenterIcon');
+            container.classList.toggle('menu-open', isRadialMenuOpen);
+            icon.textContent = isRadialMenuOpen ? '✕' : '☰';
+        }
+
+        function collapseRadialMenu() {
+            isRadialMenuOpen = false;
+            const container = document.getElementById('radialMenuContainer');
+            const icon = document.getElementById('radialCenterIcon');
+            container.classList.remove('menu-open');
+            icon.textContent = '☰';
+        }
+
+        function configureRadialButtonsForRole(role) {
+            const btn1 = document.getElementById('radialBtn1');
+            const btn2 = document.getElementById('radialBtn2');
+            const btn3 = document.getElementById('radialBtn3');
+            const btn4 = document.getElementById('radialBtn4');
+
+            if (role === 'ADMIN') {
+                btn1.innerHTML = '🏠 Beranda';
+                btn2.innerHTML = '🎓 Santri & Shift';
+                btn3.innerHTML = '🧠 Konseling BK';
+                btn4.innerHTML = '⚙️ Akun & Sistem';
+            } else if (role === 'USTADZ') {
+                btn1.innerHTML = '🏠 Beranda Ustadz';
+                btn2.innerHTML = '🔐 PIN Santri';
+                btn3.innerHTML = '📦 Inventaris';
+                btn4.innerHTML = '⚙️ Akun & Sistem';
+            } else {
+                btn1.innerHTML = '🏠 Beranda Santri';
+                btn2.innerHTML = '📋 Riwayat Absen';
+                btn3.innerHTML = '🏥 Izin & Barang';
+                btn4.innerHTML = '⚙️ Akun & Sistem';
+            }
+        }
+
+        function selectRadialNavItem(slotNumber) {
+            collapseRadialMenu();
+
+            if (!currentUser) return;
+            const role = currentUser.role;
+
+            document.getElementById('adminTabBeranda').classList.add('hidden');
+            document.getElementById('adminTabSantriShift').classList.add('hidden');
+            document.getElementById('adminTabKonselingBk').classList.add('hidden');
+            document.getElementById('viewUstadz').classList.add('hidden');
+            document.getElementById('viewSantri').classList.add('hidden');
+            document.getElementById('viewSettings').classList.add('hidden');
+
+            const badge = document.getElementById('currentNavSectionBadge');
+            const metricsSec = document.getElementById('metricsSummarySection');
+
+            if (slotNumber === 4) {
+                metricsSec.classList.add('hidden');
+                document.getElementById('viewSettings').classList.remove('hidden');
+                badge.textContent = '⚙️ Pengaturan Akun & Foto Asrama PeTIK';
+                renderAccountsTable();
+                return;
+            }
+
+            metricsSec.classList.remove('hidden');
+
+            if (role === 'ADMIN') {
+                if (slotNumber === 1) {
+                    document.getElementById('adminTabBeranda').classList.remove('hidden');
+                    badge.textContent = '🏠 Beranda Utama (Analitik, Scan Biometrik & Izin)';
+                    renderMonthlyAnalyticsCharts();
+                } else if (slotNumber === 2) {
+                    document.getElementById('adminTabSantriShift').classList.remove('hidden');
+                    badge.textContent = '🎓 Kelola Jadwal Shift (Edit/Hapus) & Data Santri';
+                } else if (slotNumber === 3) {
+                    document.getElementById('adminTabKonselingBk').classList.remove('hidden');
+                    badge.textContent = '🧠 AI Predictive Early Warning (BK Manual) & Log Kehadiran';
+                }
+            } else if (role === 'USTADZ') {
+                document.getElementById('viewUstadz').classList.remove('hidden');
+                badge.textContent = slotNumber === 1
+                    ? '🏠 Beranda Kerja Ustadz & Presensi Outdoor'
+                    : (slotNumber === 2 ? '🔐 Manajemen PIN Cadangan Santri' : '📦 Manajemen Inventaris Kamar & Kelas');
+            } else {
+                document.getElementById('viewSantri').classList.remove('hidden');
+                badge.textContent = '🎓 Portal Informasi Kehadiran & Kedisiplinan Santri';
+                const selectEl = document.getElementById('parentChildSelect');
+                if (currentUser.linked_student_id) {
+                    selectEl.value = currentUser.linked_student_id;
+                    selectEl.disabled = true;
+                }
+                renderSantriPortal();
+            }
+        }
+
+        // =========================================================
+        // 3. ANIMASI TRANSISI: TAMPILAN AWAL <-> LOGIN <-> DASHBOARD
+        // =========================================================
+        function enterLoginScreenFromSplash() {
+            const splash = document.getElementById('splashScreen');
+            const login = document.getElementById('loginScreen');
+            splash.classList.add('splash-hidden');
+            login.classList.remove('login-initial', 'login-exit-to-dashboard');
+            login.classList.add('login-active');
+        }
+
+        function backToSplashScreen() {
+            const splash = document.getElementById('splashScreen');
+            const login = document.getElementById('loginScreen');
+            login.classList.remove('login-active');
+            login.classList.add('login-initial');
+            splash.classList.remove('splash-hidden');
+        }
+
+        function showFullLoginScreen() {
+            const login = document.getElementById('loginScreen');
+            const mainApp = document.getElementById('mainAppWrapper');
+            mainApp.classList.remove('dashboard-visible');
+            mainApp.classList.add('dashboard-hidden');
+            login.classList.remove('login-initial', 'login-exit-to-dashboard');
+            login.classList.add('login-active');
+        }
+
+        function selectLoginRole(role) {
+            selectedLoginRole = role;
+            const activeTab = "py-3 px-2 rounded-2xl text-xs font-bold transition-all flex flex-col items-center justify-center gap-1.5 border bg-pesantren-600 text-white border-pesantren-600 shadow-md transform -translate-y-0.5";
+            const inactiveTab = "py-3 px-2 rounded-2xl text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1.5 border bg-slate-50 text-navy-900 border-slate-200 hover:bg-pesantren-50 hover:border-pesantren-500/50";
+
+            document.getElementById('tabLoginSantri').className = role === 'SANTRI' ? activeTab : inactiveTab;
+            document.getElementById('tabLoginUstadz').className = role === 'USTADZ' ? activeTab : inactiveTab;
+            document.getElementById('tabLoginAdmin').className = role === 'ADMIN' ? activeTab : inactiveTab;
+
+            const roleConfig = {
+                'SANTRI': { title: 'Jalur Aktif: Portal Santri Pondok', badge: 'SANTRI' },
+                'USTADZ': { title: 'Jalur Aktif: Portal Ustadz & Musyrif', badge: 'USTADZ' },
+                'ADMIN': { title: 'Jalur Aktif: Administrator Pondok', badge: 'ADMIN' }
+            }[role];
+
+            document.getElementById('loginRoleTitle').textContent = roleConfig.title;
+            document.getElementById('loginRoleBadge').textContent = roleConfig.badge;
+            document.getElementById('loginErrorBox').classList.add('hidden');
+        }
+
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const errBox = document.getElementById('loginErrorBox');
+            errBox.classList.add('hidden');
+
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: selectedLoginRole, username, password })
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                errBox.textContent = data.detail;
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            applyAuthenticatedSession(data);
+        }
+
+        function applyAuthenticatedSession(userObj) {
+            currentUser = userObj;
+            localStorage.setItem('sim_pontren_active_user', JSON.stringify(userObj));
+
+            const login = document.getElementById('loginScreen');
+            const splash = document.getElementById('splashScreen');
+            const mainApp = document.getElementById('mainAppWrapper');
+
+            splash.classList.add('splash-hidden');
+            login.classList.remove('login-active');
+            login.classList.add('login-exit-to-dashboard');
+
+            mainApp.classList.remove('dashboard-hidden');
+            mainApp.classList.add('dashboard-visible');
+
+            document.getElementById('activeUserBadgeTop').textContent = `👤 ${userObj.full_name} (${userObj.role})`;
+
+            configureRadialButtonsForRole(userObj.role);
+            selectRadialNavItem(1);
+            showToast(`Assalamu'alaikum, selamat datang ${userObj.full_name} (${userObj.role})`);
+        }
+
+        // =========================================================
+        // 4. GANTI FOTO ASRAMA PeTIK JOMBANG DARI ADMIN
+        // =========================================================
+        function applyDormPhotoToDOM(photoUrl) {
+            const targetUrl = photoUrl || DEFAULT_DORM_PHOTO;
+            const loginImg = document.getElementById('loginDormPhotoImg');
+            const previewImg = document.getElementById('settingsDormPhotoPreview');
+            if (loginImg) loginImg.src = targetUrl;
+            if (previewImg) previewImg.src = targetUrl;
+        }
+
+        async function uploadDormPhotoFile() {
+            const fileInput = document.getElementById('dormPhotoFileInput');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showToast("Pilih file foto gedung asrama dari perangkat Anda terlebih dahulu!", true);
+                return;
+            }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                const dataUrl = evt.target.result;
+                const res = await fetch('/api/settings/dorm-photo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ photo_data: dataUrl })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    applyDormPhotoToDOM(data.dorm_photo_url);
+                    fileInput.value = '';
+                    showToast(data.message);
+                } else {
+                    showToast("Gagal menyimpan foto asrama.", true);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function saveDormPhotoUrl() {
+            const urlVal = document.getElementById('dormPhotoUrlInput').value.trim();
+            if (!urlVal) {
+                showToast("Masukkan URL gambar terlebih dahulu!", true);
+                return;
+            }
+            const res = await fetch('/api/settings/dorm-photo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ photo_data: urlVal })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                applyDormPhotoToDOM(data.dorm_photo_url);
+                showToast(data.message);
+            }
+        }
+
+        async function resetDefaultDormPhoto() {
+            const res = await fetch('/api/settings/dorm-photo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ photo_data: DEFAULT_DORM_PHOTO })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById('dormPhotoUrlInput').value = '';
+                applyDormPhotoToDOM(data.dorm_photo_url);
+                showToast("Foto Asrama PeTIK Jombang dikembalikan ke gambar default.");
+            }
+        }
+
+        // =========================================================
+        // 5. FITUR BARU: EDIT & HAPUS JADWAL SHIFT KEGIATAN
+        // =========================================================
+        async function submitNewShift(e) {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('newShiftName').value,
+                category: document.getElementById('newShiftCategory').value,
+                start_time: document.getElementById('newShiftStart').value,
+                on_time_limit: document.getElementById('newShiftLimit').value,
+                end_time: document.getElementById('newShiftEnd').value || "23:59",
+                late_points: parseInt(document.getElementById('newShiftLatePts').value) || 0,
+                absent_points: parseInt(document.getElementById('newShiftAbsentPts').value) || 0
+            };
+            const res = await fetch('/api/shifts/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            document.getElementById('newShiftName').value = '';
+            showToast(data.message);
+            await loadSystemState();
+        }
+
+        function openEditShiftModal(shiftId) {
+            const sh = appState.shifts.find(item => item.id === shiftId);
+            if (!sh) return;
+
+            document.getElementById('editShiftIdInput').value = sh.id;
+            document.getElementById('editShiftNameInput').value = sh.name;
+            document.getElementById('editShiftCategoryInput').value = sh.category;
+            document.getElementById('editShiftStartInput').value = sh.start_time;
+            document.getElementById('editShiftLimitInput').value = sh.on_time_limit;
+            document.getElementById('editShiftEndInput').value = sh.end_time;
+            document.getElementById('editShiftLatePtsInput').value = sh.late_points;
+            document.getElementById('editShiftAbsentPtsInput').value = sh.absent_points;
+
+            document.getElementById('editShiftModal').classList.remove('hidden');
+        }
+
+        function closeEditShiftModal() {
+            document.getElementById('editShiftModal').classList.add('hidden');
+        }
+
+        async function submitEditShift(e) {
+            e.preventDefault();
+            const shiftId = parseInt(document.getElementById('editShiftIdInput').value);
+            const payload = {
+                name: document.getElementById('editShiftNameInput').value,
+                category: document.getElementById('editShiftCategoryInput').value,
+                start_time: document.getElementById('editShiftStartInput').value,
+                on_time_limit: document.getElementById('editShiftLimitInput').value,
+                end_time: document.getElementById('editShiftEndInput').value,
+                late_points: parseInt(document.getElementById('editShiftLatePtsInput').value) || 0,
+                absent_points: parseInt(document.getElementById('editShiftAbsentPtsInput').value) || 0
+            };
+
+            const res = await fetch(`/api/shifts/${shiftId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                showToast(data.detail, true);
+            } else {
+                closeEditShiftModal();
+                showToast(data.message);
+                await loadSystemState();
+            }
+        }
+
+        async function deleteShiftById(shiftId, shiftName) {
+            if (!confirm(`Yakin ingin menghapus jadwal shift "${shiftName}"?`)) return;
+            const res = await fetch(`/api/shifts/${shiftId}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (!res.ok) {
+                showToast(data.detail, true);
+            } else {
+                showToast(data.message);
+                await loadSystemState();
+            }
+        }
+
+        // =========================================================
+        // 6. MODAL EDIT PROFIL SANTRI
+        // =========================================================
+        function openEditStudentModal(studentId) {
+            const s = appState.students.find(item => item.id === studentId);
+            if (!s) return;
+
+            document.getElementById('editStudentIdInput').value = s.id;
+            document.getElementById('editStudentModalNis').textContent = `NIS: ${s.nis} • ID Sidik Jari: ${s.fingerprint_id}`;
+            document.getElementById('editStudentNameInput').value = s.name;
+            document.getElementById('editStudentDormInput').value = s.dorm_room;
+            document.getElementById('editStudentClassInput').value = s.classroom;
+            document.getElementById('editStudentParentInput').value = s.parent_name;
+            document.getElementById('editStudentWaInput').value = s.parent_wa;
+            document.getElementById('editStudentPointsInput').value = s.discipline_points;
+
+            document.getElementById('editStudentModal').classList.remove('hidden');
+        }
+
+        function closeEditStudentModal() {
+            document.getElementById('editStudentModal').classList.add('hidden');
+        }
+
+        async function submitEditStudentProfile(e) {
+            e.preventDefault();
+            const studentId = parseInt(document.getElementById('editStudentIdInput').value);
+            const payload = {
+                name: document.getElementById('editStudentNameInput').value,
+                dorm_room: document.getElementById('editStudentDormInput').value,
+                classroom: document.getElementById('editStudentClassInput').value,
+                parent_name: document.getElementById('editStudentParentInput').value,
+                parent_wa: document.getElementById('editStudentWaInput').value,
+                discipline_points: parseInt(document.getElementById('editStudentPointsInput').value) || 0
+            };
+
+            const res = await fetch(`/api/students/${studentId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                showToast(data.detail, true);
+            } else {
+                closeEditStudentModal();
+                showToast(data.message);
+                await loadSystemState();
+            }
+        }
+
+        // =========================================================
+        // 7. MANAJEMEN AKUN & PENGATURAN
+        // =========================================================
+        function togglePasswordVisibility() {
+            showPasswordsInTable = !showPasswordsInTable;
+            renderAccountsTable();
+        }
+
+        function renderAccountsTable() {
+            const tbody = document.getElementById('accountsTableBody');
+            tbody.innerHTML = appState.accounts.map(acc => {
+                const roleBadge = acc.role === 'ADMIN'
+                    ? 'bg-navy-900 text-white'
+                    : (acc.role === 'USTADZ' ? 'bg-pesantren-600 text-white' : 'bg-pesantren-100 text-pesantren-700');
+                const isCurrent = currentUser && currentUser.id === acc.id;
+                return `
+                    <tr class="${isCurrent ? 'bg-pesantren-50/70' : 'hover:bg-slate-50'}">
+                        <td class="py-3 px-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${roleBadge}">${acc.role}</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="font-semibold text-navy-900">${acc.full_name} ${isCurrent ? '<span class="text-xs text-pesantren-600 font-bold">(Aktif)</span>' : ''}</div>
+                            <div class="text-xs text-slate-500">${acc.role_title}</div>
+                        </td>
+                        <td class="py-3 px-4 font-mono font-semibold text-navy-900">${acc.username}</td>
+                        <td class="py-3 px-4 font-mono text-xs ${showPasswordsInTable ? 'text-pesantren-700 font-bold' : 'text-slate-400'}">
+                            ${showPasswordsInTable ? acc.password : '••••••••'}
+                        </td>
+                        <td class="py-3 px-4 flex flex-wrap gap-1.5">
+                            <button onclick="directSwitchAccount(${acc.id})" class="bg-pesantren-600 hover:bg-pesantren-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                                🔑 Masuk Login
+                            </button>
+                            <button onclick="selectAccountToEdit(${acc.id})" class="bg-navy-900 hover:bg-navy-800 text-white text-xs px-2.5 py-1.5 rounded-lg transition">
+                                ✏️ Edit
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            const editSelect = document.getElementById('editAccountSelect');
+            if (editSelect && appState.accounts.length > 0) {
+                const currentVal = editSelect.value;
+                editSelect.innerHTML = appState.accounts.map(a => `<option value="${a.id}">[${a.role}] ${a.full_name} (${a.username})</option>`).join('');
+                if (currentVal) editSelect.value = currentVal;
+                populateEditAccountForm();
+            }
+        }
+
+        function directSwitchAccount(accountId) {
+            const acc = appState.accounts.find(a => a.id === accountId);
+            if (!acc) return;
+            applyAuthenticatedSession(acc);
+        }
+
+        function selectAccountToEdit(accountId) {
+            document.getElementById('editAccountSelect').value = accountId;
+            populateEditAccountForm();
+        }
+
+        function populateEditAccountForm() {
+            const accountId = parseInt(document.getElementById('editAccountSelect').value);
+            const acc = appState.accounts.find(a => a.id === accountId);
+            if (!acc) return;
+            document.getElementById('editAccountFullName').value = acc.full_name;
+            document.getElementById('editAccountUsername').value = acc.username;
+            document.getElementById('editAccountPassword').value = acc.password;
+        }
+
+        async function submitCreateStaffAccount(e) {
+            e.preventDefault();
+            const payload = {
+                role: document.getElementById('newStaffRole').value,
+                role_title: document.getElementById('newStaffTitle').value,
+                full_name: document.getElementById('newStaffFullName').value,
+                username: document.getElementById('newStaffUsername').value,
+                password: document.getElementById('newStaffPassword').value
+            };
+            const res = await fetch('/api/accounts/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) showToast(data.detail, true);
+            else {
+                document.getElementById('newStaffFullName').value = '';
+                document.getElementById('newStaffUsername').value = '';
+                showToast(data.message);
+                await loadSystemState();
+                renderAccountsTable();
+            }
+        }
+
+        async function submitAccountUpdate(e) {
+            e.preventDefault();
+            const payload = {
+                account_id: parseInt(document.getElementById('editAccountSelect').value),
+                full_name: document.getElementById('editAccountFullName').value,
+                username: document.getElementById('editAccountUsername').value,
+                password: document.getElementById('editAccountPassword').value
+            };
+            const res = await fetch('/api/accounts/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) showToast(data.detail, true);
+            else {
+                showToast(data.message);
+                await loadSystemState();
+                renderAccountsTable();
+            }
+        }
+
+        async function resetAllSystemData() {
+            if (!confirm("Yakin ingin mengosongkan SEMUA data (Santri, Jadwal Shift, Absensi, Izin, Inventaris, Catatan BK, dan Akun Non-Admin)?")) return;
+            const res = await fetch('/api/system/reset-all-data', { method: 'POST' });
+            const data = await res.json();
+            offlineQueue = [];
+            localStorage.removeItem('sim_pontren_offline_queue');
+            showToast(data.message);
+            await loadSystemState();
+            renderAccountsTable();
+        }
+
+        // =========================================================
+        // 8. TAMBAH SANTRI, IMPORT EXCEL, & HAPUS SANTRI
+        // =========================================================
+        function autoSuggestUsername() {
+            const nameVal = document.getElementById('newStudentName').value.trim();
+            if (!nameVal) {
+                document.getElementById('newStudentUsername').value = '';
+                return;
+            }
+            const firstWord = nameVal.split(/\s+/)[0].replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+            document.getElementById('newStudentUsername').value = firstWord;
+        }
+
+        function generateRandomPinInto(inputId) {
+            const randomPin = Math.floor(100000 + Math.random() * 900000).toString();
+            document.getElementById(inputId).value = randomPin;
+        }
+
+        function syncSelectedStudentPin(mode) {
+            const selectId = mode === 'admin' ? 'adminPinStudentId' : 'ustadzPinStudentId';
+            const inputId = mode === 'admin' ? 'adminNewPinInput' : 'ustadzNewPinInput';
+            const studentId = parseInt(document.getElementById(selectId).value);
+            const student = appState.students.find(s => s.id === studentId);
+            if (student) {
+                document.getElementById(inputId).value = student.backup_pin;
+            } else {
+                document.getElementById(inputId).value = '';
+            }
+        }
+
+        async function submitNewStudent(e) {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('newStudentName').value,
+                dorm_room: document.getElementById('newStudentDorm').value,
+                classroom: document.getElementById('newStudentClass').value,
+                parent_name: document.getElementById('newStudentParent').value,
+                parent_wa: document.getElementById('newStudentWa').value,
+                custom_username: document.getElementById('newStudentUsername').value,
+                custom_password: document.getElementById('newStudentPassword').value || 'santri123',
+                custom_pin: document.getElementById('newStudentPin').value
+            };
+
+            const res = await fetch('/api/students/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                showToast(data.detail, true);
+                return;
+            }
+
+            document.getElementById('newStudentName').value = '';
+            document.getElementById('newStudentParent').value = '';
+            document.getElementById('newStudentUsername').value = '';
+            document.getElementById('newStudentPin').value = '';
+
+            showToast(data.message);
+            await loadSystemState();
+        }
+
+        async function submitExcelImport() {
+            const fileInput = document.getElementById('excelFileInput');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showToast("Pilih file Excel (.xlsx) terlebih dahulu!", true);
+                return;
+            }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = async function(evt) {
+                const base64Content = evt.target.result;
+                const res = await fetch('/api/students/import-excel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ file_base64: base64Content })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    showToast(data.detail, true);
+                } else {
+                    fileInput.value = '';
+                    showToast(data.message);
+                    await loadSystemState();
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function deleteStudentById(studentId, studentName) {
+            if (!confirm(`Yakin ingin menghapus data santri "${studentName}" beserta akun login dan riwayatnya?`)) return;
+            const res = await fetch(`/api/students/${studentId}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (!res.ok) {
+                showToast(data.detail, true);
+            } else {
+                showToast(data.message);
+                await loadSystemState();
+            }
+        }
+
+        async function submitStudentPinUpdate(roleSource) {
+            const selectEl = document.getElementById(roleSource === 'ADMIN' ? 'adminPinStudentId' : 'ustadzPinStudentId');
+            if (!selectEl.value) {
+                showToast("Belum ada data santri. Tambahkan santri terlebih dahulu.", true);
+                return;
+            }
+            const studentId = parseInt(selectEl.value);
+            const newPin = document.getElementById(
+                roleSource === 'ADMIN' ? 'adminNewPinInput' : 'ustadzNewPinInput'
+            ).value;
+
+            const payload = {
+                student_id: studentId,
+                new_pin: newPin,
+                actor_role: roleSource,
+                actor_name: currentUser ? currentUser.full_name : roleSource
+            };
+
+            const res = await fetch('/api/students/update-pin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                showToast(data.detail, true);
+            } else {
+                showToast(data.message);
+                await loadSystemState();
+            }
+        }
+
+        // =========================================================
+        // 9. LOGIKA MANUAL AI PREDICTIVE EARLY WARNING (BK)
+        // =========================================================
+        function previewManualBkScore() {
+            const late = parseInt(document.getElementById('bkLateCount').value) || 0;
+            const sakit = parseInt(document.getElementById('bkSakitCount').value) || 0;
+            const alfa = parseInt(document.getElementById('bkAlfaCount').value) || 0;
+            const calc = Math.min(Math.round(((late * 6.0) + (sakit * 4.5) + (alfa * 15.0)) * 10) / 10, 100);
+            document.getElementById('bkCustomScore').value = calc;
+        }
+
+        async function submitManualBkRecord(e) {
+            e.preventDefault();
+            const studentVal = document.getElementById('bkStudentId').value;
+            if (!studentVal) {
+                showToast("Pilih santri terlebih dahulu untuk membuat catatan BK.", true);
+                return;
+            }
+
+            const payload = {
+                student_id: parseInt(studentVal),
+                late_subuh_curfew: parseInt(document.getElementById('bkLateCount').value) || 0,
+                sakit_freq: parseInt(document.getElementById('bkSakitCount').value) || 0,
+                alfa_count: parseInt(document.getElementById('bkAlfaCount').value) || 0,
+                custom_risk_score: parseFloat(document.getElementById('bkCustomScore').value) || 0,
+                level: document.getElementById('bkLevelSelect').value,
+                indicators: document.getElementById('bkIndicatorsInput').value,
+                recommendation: document.getElementById('bkRecommendationInput').value
+            };
+
+            const res = await fetch('/api/bk-records/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                showToast(data.detail, true);
+                return;
+            }
+
+            document.getElementById('bkLateCount').value = 0;
+            document.getElementById('bkSakitCount').value = 0;
+            document.getElementById('bkAlfaCount').value = 0;
+            document.getElementById('bkCustomScore').value = 0;
+            document.getElementById('bkIndicatorsInput').value = '';
+            document.getElementById('bkRecommendationInput').value = '';
+
+            showToast(data.message);
+            await loadSystemState();
+        }
+
+        async function deleteSingleBkRecord(recId) {
+            const res = await fetch(`/api/bk-records/${recId}`, { method: 'DELETE' });
+            const data = await res.json();
+            showToast(data.message);
+            await loadSystemState();
+        }
+
+        async function clearAllBkHistory() {
+            if (!confirm("Kosongkan seluruh riwayat tabel AI Predictive Early Warning (BK)?")) return;
+            const res = await fetch('/api/bk-records/clear', { method: 'POST' });
+            const data = await res.json();
+            showToast(data.message);
+            await loadSystemState();
+        }
+
+        // =========================================================
+        // 10. VISUALISASI ANALITIK KEHADIRAN BULANAN
+        // =========================================================
+        function renderMonthlyAnalyticsCharts() {
+            if (!appState.analytics) return;
+            const an = appState.analytics;
+
+            document.getElementById('sumOnTime').textContent = an.summary_totals.tepat_waktu;
+            document.getElementById('sumLate').textContent = an.summary_totals.terlambat;
+            document.getElementById('sumAlpha').textContent = an.summary_totals.alfa;
+
+            const ctxShift = document.getElementById('monthlyShiftChart');
+            const ctxTrend = document.getElementById('monthlyTrendChart');
+            if (!ctxShift || !ctxTrend) return;
+
+            if (shiftChartInstance) shiftChartInstance.destroy();
+            if (trendChartInstance) trendChartInstance.destroy();
+
+            shiftChartInstance = new Chart(ctxShift, {
+                type: 'bar',
+                data: {
+                    labels: an.shift_labels,
+                    datasets: [
+                        { label: 'Tepat Waktu', data: an.on_time_series, backgroundColor: '#059669', borderRadius: 6 },
+                        { label: 'Terlambat', data: an.late_series, backgroundColor: '#0A192F', borderRadius: 6 },
+                        { label: 'Alfa', data: an.alpha_series, backgroundColor: '#DC2626', borderRadius: 6 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { font: { family: 'Poppins', size: 11 } } } },
+                    scales: {
+                        x: { ticks: { font: { family: 'Poppins', size: 10 } } },
+                        y: { beginAtZero: true, ticks: { stepSize: 1, font: { family: 'Poppins', size: 10 } } }
+                    }
+                }
+            });
+
+            trendChartInstance = new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: an.weekly_labels,
+                    datasets: [
+                        {
+                            label: '% Hadir Tepat Waktu',
+                            data: an.weekly_ontime_pct,
+                            borderColor: '#059669',
+                            backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.35,
+                            pointBackgroundColor: '#0A192F',
+                            pointRadius: 5
+                        },
+                        {
+                            label: '% Terlambat',
+                            data: an.weekly_late_pct,
+                            borderColor: '#0A192F',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.35,
+                            pointRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { font: { family: 'Poppins', size: 11 } } } },
+                    scales: {
+                        y: { min: 0, max: 100, ticks: { callback: v => v + '%', font: { family: 'Poppins', size: 10 } } },
+                        x: { ticks: { font: { family: 'Poppins', size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        // =========================================================
+        // 11. FUNGSI OPERASIONAL ABSENSI, IZIN, & INVENTARIS
+        // =========================================================
+        function togglePinInput() {
+            const mode = document.getElementById('scanAuthMode').value;
+            document.getElementById('pinInputWrapper').classList.toggle('hidden', mode === 'FINGERPRINT');
+        }
+
+        function toggleOfflineMode() {
+            isOfflineMode = !isOfflineMode;
+            const badge = document.getElementById('connectionBadge');
+            const text = document.getElementById('connectionText');
+            if (isOfflineMode) {
+                badge.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 text-navy-900 text-xs font-bold";
+                text.textContent = "OFFLINE";
+                showToast("Mode Offline Aktif: Scan presensi disimpan di buffer lokal.");
+            } else {
+                badge.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pesantren-600 text-white text-xs font-bold";
+                text.textContent = "ONLINE";
+                showToast("Koneksi Kembali Online!");
+                if (offlineQueue.length > 0) syncOfflineQueue();
+            }
+            updateOfflineButton();
+        }
+
+        function updateOfflineButton() {
+            const btn = document.getElementById('btnSyncOffline');
+            document.getElementById('offlineCount').textContent = offlineQueue.length;
+            btn.classList.toggle('hidden', offlineQueue.length === 0);
+        }
+
+        async function loadSystemState() {
+            const res = await fetch('/api/state');
+            appState = await res.json();
+
+            applyDormPhotoToDOM(appState.dorm_photo_url);
+
+            document.getElementById('statTotalStudents').textContent = appState.students.length;
+            document.getElementById('statTotalLogs').textContent = appState.logs.length;
+            document.getElementById('statLeavesLoans').textContent = `${appState.leaves.length} / ${appState.loans.filter(l => l.status === 'DIPINJAM').length}`;
+            document.getElementById('statWaSent').textContent = appState.wa_logs.length;
+            document.getElementById('shiftCountBadge').textContent = `${appState.shifts.length} Shift Aktif`;
+            document.getElementById('studentTableCountBadge').textContent = `${appState.students.length} Santri`;
+
+            const banner = document.getElementById('missingStudentBanner');
+            if (appState.missing_students.length > 0) {
+                banner.classList.remove('hidden');
+                document.getElementById('missingStudentText').textContent = appState.missing_students
+                    .map(s => `${s.name} (${s.dorm_room} - Alfa ${s.consecutive_absent}x berturut-turut)`).join(' | ');
+            } else {
+                banner.classList.add('hidden');
+            }
+
+            const shiftOptions = appState.shifts.length
+                ? appState.shifts.map(s => `<option value="${s.id}">${s.name} (Batas Tepat: ${s.on_time_limit})</option>`).join('')
+                : `<option value="">-- Belum ada jadwal shift (Buat di menu Santri & Shift) --</option>`;
+            document.getElementById('scanShiftId').innerHTML = shiftOptions;
+            document.getElementById('ustadzShiftId').innerHTML = shiftOptions;
+
+            // Render Tabel Daftar Jadwal Shift Kegiatan (Lengkap dengan Tombol Edit & Hapus)
+            document.getElementById('shiftsMasterTableBody').innerHTML = appState.shifts.length
+                ? appState.shifts.map(sh => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3 px-4 font-semibold text-navy-900">${sh.name}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-pesantren-50 text-pesantren-700 border border-pesantren-500/40">${sh.category}</span>
+                        </td>
+                        <td class="py-3 px-4 font-mono text-xs font-semibold text-navy-900">${sh.start_time} WIB</td>
+                        <td class="py-3 px-4 font-mono text-xs font-bold text-pesantren-700">${sh.on_time_limit} WIB</td>
+                        <td class="py-3 px-4 font-mono text-xs text-slate-600">${sh.end_time} WIB</td>
+                        <td class="py-3 px-4 text-xs">
+                            <span class="font-semibold text-amber-700 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded mr-1">Telat: +${sh.late_points} Poin</span>
+                            <span class="font-semibold text-red-700 bg-red-50 border border-red-300 px-2 py-0.5 rounded">Alfa: +${sh.absent_points} Poin</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="openEditShiftModal(${sh.id})"
+                                    class="bg-navy-900 hover:bg-pesantren-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                                    ✏️ Edit Shift
+                                </button>
+                                <button onclick="deleteShiftById(${sh.id}, '${sh.name.replace(/'/g, "\\'")}')"
+                                    class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                                    🗑️ Hapus
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('')
+                : `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Belum ada jadwal shift kegiatan. Tambahkan jadwal pada formulir di atas.</td></tr>`;
+
+            const studentScanOptions = appState.students.length
+                ? appState.students.map(s => `<option value="${s.fingerprint_id}">${s.name} [${s.fingerprint_id} | PIN: ${s.backup_pin}]</option>`).join('')
+                : `<option value="">-- Belum ada data santri --</option>`;
+            document.getElementById('scanStudentIdentifier').innerHTML = studentScanOptions;
+            document.getElementById('ustadzStudentNis').innerHTML = studentScanOptions;
+
+            const studentIdOptions = appState.students.length
+                ? appState.students.map(s => `<option value="${s.id}">${s.name} (${s.dorm_room} - PIN: ${s.backup_pin})</option>`).join('')
+                : `<option value="">-- Belum ada data santri --</option>`;
+            document.getElementById('leaveStudentId').innerHTML = studentIdOptions;
+            document.getElementById('invStudentId').innerHTML = studentIdOptions;
+            document.getElementById('parentChildSelect').innerHTML = studentIdOptions;
+            document.getElementById('adminPinStudentId').innerHTML = studentIdOptions;
+            document.getElementById('ustadzPinStudentId').innerHTML = studentIdOptions;
+            document.getElementById('bkStudentId').innerHTML = studentIdOptions;
+
+            syncSelectedStudentPin('admin');
+            syncSelectedStudentPin('ustadz');
+
+            // Render Tabel Master Santri + Tombol Edit Profil & Hapus Santri
+            document.getElementById('studentsMasterTableBody').innerHTML = appState.students.length
+                ? appState.students.map(s => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3 px-4 font-mono text-xs font-bold text-navy-900">${s.nis}</td>
+                        <td class="py-3 px-4 font-semibold text-navy-900">${s.name}</td>
+                        <td class="py-3 px-4 text-xs text-slate-600">${s.dorm_room}<br><span class="text-slate-400">${s.classroom}</span></td>
+                        <td class="py-3 px-4">
+                            <span class="font-mono text-xs bg-slate-100 border border-slate-300 px-2 py-0.5 rounded mr-1">${s.fingerprint_id}</span>
+                            <span class="font-mono text-xs bg-navy-900 text-white px-2 py-0.5 rounded font-bold">PIN: ${s.backup_pin}</span>
+                        </td>
+                        <td class="py-3 px-4 text-xs">${s.parent_name}<br><span class="text-pesantren-600 font-medium">${s.parent_wa}</span></td>
+                        <td class="py-3 px-4 font-bold text-navy-900">${s.discipline_points} Poin</td>
+                        <td class="py-3 px-4">
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="openEditStudentModal(${s.id})"
+                                    class="bg-navy-900 hover:bg-pesantren-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                                    ✏️ Edit Profil
+                                </button>
+                                <button onclick="deleteStudentById(${s.id}, '${s.name.replace(/'/g, "\\'")}')"
+                                    class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                                    🗑️ Hapus
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('')
+                : `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Belum ada data santri. Tambahkan manual atau gunakan Import Excel (.xlsx) di atas.</td></tr>`;
+
+            // Render Tabel AI Early Warning (Murni dari Input Manual BK)
+            document.getElementById('aiEarlyWarningTable').innerHTML = appState.bk_records.length
+                ? appState.bk_records.map(r => {
+                    const badgeColor = r.risk_score >= 70
+                        ? 'bg-red-100 text-red-700 border-red-300'
+                        : (r.risk_score >= 40 ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-pesantren-100 text-pesantren-700 border-pesantren-500');
+                    return `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 font-semibold text-navy-900">
+                                ${r.name}
+                                <div class="text-xs font-normal text-slate-500">${r.nis} • ${r.dorm_room}</div>
+                            </td>
+                            <td class="py-3 px-4"><span class="font-mono text-xs bg-navy-900 text-white px-2.5 py-1 rounded-lg font-bold">${r.backup_pin || '-'}</span></td>
+                            <td class="py-3 px-4 font-bold text-lg text-navy-900">${r.risk_score} / 100</td>
+                            <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeColor}">${r.level}</span></td>
+                            <td class="py-3 px-4 text-xs text-slate-700">${r.indicators}</td>
+                            <td class="py-3 px-4 text-xs font-medium text-navy-900">${r.recommendation}</td>
+                            <td class="py-3 px-4 no-print">
+                                <button onclick="deleteSingleBkRecord(${r.id})" class="bg-red-100 hover:bg-red-200 text-red-700 text-xs font-semibold px-2.5 py-1 rounded-lg transition">
+                                    🗑️ Hapus
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('')
+                : `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Riwayat Bimbingan Konseling (AI Early Warning) masih kosong. Silakan isi form di atas untuk membuat catatan secara manual dari awal.</td></tr>`;
+
+            // Tabel Log Kehadiran
+            document.getElementById('attendanceTableBody').innerHTML = appState.logs.length
+                ? appState.logs.map(l => {
+                    const statusBadge = l.status === 'TEPAT_WAKTU'
+                        ? 'bg-pesantren-100 text-pesantren-700'
+                        : (l.status === 'TERLAMBAT' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700');
+                    return `
+                        <tr class="hover:bg-slate-50">
+                            <td class="py-3 px-4 text-xs text-slate-600">${l.timestamp}</td>
+                            <td class="py-3 px-4 font-semibold text-navy-900">${l.student_name}</td>
+                            <td class="py-3 px-4 text-xs">${l.shift_name}</td>
+                            <td class="py-3 px-4 text-xs font-medium">${l.method}</td>
+                            <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${statusBadge}">${l.status}</span></td>
+                            <td class="py-3 px-4 text-xs">${l.was_offline ? '<span class="text-amber-700 font-semibold">Offline Sync</span>' : '<span class="text-pesantren-600 font-semibold">Real-Time</span>'}</td>
+                            <td class="py-3 px-4 text-xs text-slate-500">${l.notes}</td>
+                        </tr>
+                    `;
+                }).join('')
+                : `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Belum ada catatan log kehadiran.</td></tr>`;
+
+            // Log WhatsApp
+            document.getElementById('waLogsContainer').innerHTML = appState.wa_logs.length
+                ? appState.wa_logs.map(w => `
+                    <div class="bg-white p-3 rounded-xl border border-pesantren-100 shadow-sm text-xs space-y-1">
+                        <div class="flex justify-between font-semibold text-navy-900">
+                            <span>Ke: ${w.parent_wa} (${w.student_name})</span>
+                            <span class="text-pesantren-600">${w.created_at}</span>
+                        </div>
+                        <p class="text-slate-600 whitespace-pre-line leading-relaxed">${w.message}</p>
+                    </div>
+                `).join('')
+                : `<p class="text-xs text-slate-400 text-center py-8">Belum ada notifikasi WhatsApp yang dikirim.</p>`;
+
+            // Tabel Inventaris
+            document.getElementById('inventoryTableBody').innerHTML = appState.loans.length
+                ? appState.loans.map(ln => `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3 px-4 text-xs font-mono">${ln.item_code}</td>
+                        <td class="py-3 px-4 font-semibold">${ln.item_name}</td>
+                        <td class="py-3 px-4 text-xs">${ln.location}</td>
+                        <td class="py-3 px-4 text-xs font-medium">${ln.student_name}</td>
+                        <td class="py-3 px-4 text-xs">${ln.borrowed_at}</td>
+                        <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${ln.status === 'DIPINJAM' ? 'bg-amber-100 text-amber-800' : 'bg-pesantren-100 text-pesantren-700'}">${ln.status}</span></td>
+                        <td class="py-3 px-4">
+                            ${ln.status === 'DIPINJAM' ? `<button onclick="returnInventory(${ln.id})" class="bg-pesantren-600 text-white text-xs px-3 py-1 rounded-lg hover:bg-pesantren-700">Kembalikan</button>` : '-'}
+                        </td>
+                    </tr>
+                `).join('')
+                : `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Belum ada data peminjaman inventaris.</td></tr>`;
+
+            renderAccountsTable();
+            renderSantriPortal();
+            renderMonthlyAnalyticsCharts();
+            updateOfflineButton();
+        }
+
+        async function submitBiometricScan() {
+            const identifier = document.getElementById('scanStudentIdentifier').value;
+            const shiftVal = document.getElementById('scanShiftId').value;
+            if (!identifier || !shiftVal) {
+                showToast("Pastikan Jadwal Shift dan Data Santri sudah dibuat di menu 'Santri & Shift'.", true);
+                return;
+            }
+
+            const payload = {
+                identifier: identifier,
+                shift_id: parseInt(shiftVal),
+                auth_mode: document.getElementById('scanAuthMode').value,
+                pin_code: document.getElementById('scanPinCode').value,
+                scan_time_str: document.getElementById('scanTimeInput').value,
+                was_offline: isOfflineMode
+            };
+
+            if (isOfflineMode) {
+                offlineQueue.push(payload);
+                localStorage.setItem('sim_pontren_offline_queue', JSON.stringify(offlineQueue));
+                updateOfflineButton();
+                showToast("Disimpan di Buffer Lokal Offline! Akan disinkronkan saat Online.");
+                return;
+            }
+
+            const res = await fetch('/api/attendance/scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) showToast(data.detail, true);
+            else {
+                showToast(data.message);
+                loadSystemState();
+            }
+        }
+
+        async function syncOfflineQueue() {
+            if (offlineQueue.length === 0) return;
+            const res = await fetch('/api/attendance/sync-offline', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ records: offlineQueue })
+            });
+            const data = await res.json();
+            offlineQueue = [];
+            localStorage.removeItem('sim_pontren_offline_queue');
+            updateOfflineButton();
+            showToast(data.message);
+            loadSystemState();
+        }
+
+        async function triggerAlphaSweep() {
+            const identifier = document.getElementById('scanStudentIdentifier').value;
+            const shiftVal = document.getElementById('scanShiftId').value;
+            if (!identifier || !shiftVal) {
+                showToast("Pastikan Jadwal Shift dan Data Santri sudah dibuat terlebih dahulu.", true);
+                return;
+            }
+            const student = appState.students.find(s => s.fingerprint_id === identifier);
+            const res = await fetch('/api/attendance/mark-alpha', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ student_id: student.id, shift_id: parseInt(shiftVal) })
+            });
+            const data = await res.json();
+            if (!res.ok) showToast(data.detail, true);
+            else {
+                showToast(data.message);
+                loadSystemState();
+            }
+        }
+
+        async function submitLeaveRequest() {
+            const studentVal = document.getElementById('leaveStudentId').value;
+            if (!studentVal) {
+                showToast("Belum ada data santri.", true);
+                return;
+            }
+            const payload = {
+                student_id: parseInt(studentVal),
+                leave_type: document.getElementById('leaveType').value,
+                approved_by: document.getElementById('leaveApprover').value || "Pengasuhan Pondok",
+                start_date: document.getElementById('leaveStartDate').value || new Date().toISOString().slice(0, 10),
+                end_date: document.getElementById('leaveEndDate').value || new Date().toISOString().slice(0, 10),
+                reason: document.getElementById('leaveReason').value || "Izin tercatat di sistem"
+            };
+            const res = await fetch('/api/leaves', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            showToast(data.message);
+            loadSystemState();
+        }
+
+        async function submitUstadzOutdoorAttendance() {
+            const identifier = document.getElementById('ustadzStudentNis').value;
+            const shiftVal = document.getElementById('ustadzShiftId').value;
+            if (!identifier || !shiftVal) {
+                showToast("Pastikan Jadwal Shift dan Data Santri sudah dibuat.", true);
+                return;
+            }
+            const payload = {
+                identifier: identifier,
+                shift_id: parseInt(shiftVal),
+                auth_mode: "MANUAL_USTADZ",
+                notes: document.getElementById('ustadzNotes').value || "Input Manual Lapangan oleh Ustadz"
+            };
+            const res = await fetch('/api/attendance/scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) showToast(data.detail, true);
+            else {
+                showToast(data.message);
+                loadSystemState();
+            }
+        }
+
+        async function submitInventoryLoan() {
+            const studentVal = document.getElementById('invStudentId').value;
+            if (!studentVal) {
+                showToast("Belum ada data santri.", true);
+                return;
+            }
+            const payload = {
+                item_code: document.getElementById('invCode').value || "INV-001",
+                item_name: document.getElementById('invName').value || "Inventaris Kamar/Kelas",
+                location: document.getElementById('invLocation').value || "Pondok",
+                student_id: parseInt(studentVal)
+            };
+            const res = await fetch('/api/inventory/loan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            showToast(data.message);
+            loadSystemState();
+        }
+
+        async function returnInventory(loanId) {
+            const res = await fetch(`/api/inventory/return/${loanId}`, { method: 'POST' });
+            const data = await res.json();
+            showToast(data.message);
+            loadSystemState();
+        }
+
+        function renderSantriPortal() {
+            const selectEl = document.getElementById('parentChildSelect');
+            if (!selectEl || !selectEl.value) {
+                document.getElementById('parentPortalContent').innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Belum ada data santri terdaftar.</p>`;
+                return;
+            }
+            const studentId = parseInt(selectEl.value);
+            const student = appState.students.find(s => s.id === studentId);
+            if (!student) return;
+
+            const studentLogs = appState.logs.filter(l => l.student_name === student.name);
+            const studentLeaves = appState.leaves.filter(lv => lv.student_name === student.name);
+            const studentLoans = appState.loans.filter(ln => ln.student_name === student.name);
+
+            document.getElementById('parentPortalContent').innerHTML = `
+                <div class="bg-pesantren-50 border border-pesantren-500 rounded-2xl p-5">
+                    <div class="flex flex-wrap justify-between items-start gap-2">
+                        <div>
+                            <h4 class="font-bold text-navy-900 text-lg">${student.name}</h4>
+                            <p class="text-xs text-slate-600">${student.nis} • ${student.dorm_room} • ${student.classroom}</p>
+                        </div>
+                        <span class="bg-navy-900 text-white text-xs font-mono px-3 py-1 rounded-lg">
+                            ID Jari: ${student.fingerprint_id} | PIN: ${student.backup_pin}
+                        </span>
+                    </div>
+                    <div class="mt-4 grid grid-cols-2 gap-3 text-center">
+                        <div class="bg-white p-3 rounded-xl border border-slate-200">
+                            <p class="text-xs text-slate-500">Total Poin Pelanggaran</p>
+                            <p class="text-2xl font-bold text-navy-900">${student.discipline_points}</p>
+                        </div>
+                        <div class="bg-pesantren-600 text-white p-3 rounded-xl">
+                            <p class="text-xs text-pesantren-100">Status Kehadiran Asrama</p>
+                            <p class="text-sm font-bold mt-1.5">${student.consecutive_absent >= 3 ? 'PERLU PEMBINAAN BK' : 'AKTIF & TERPANTAU AMAN'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h5 class="text-xs font-bold uppercase text-navy-900 mb-2">Riwayat Presensi Biometrik Terkini</h5>
+                    <div class="space-y-2">
+                        ${studentLogs.length ? studentLogs.slice(0, 6).map(l => `
+                            <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                                <div>
+                                    <p class="font-semibold text-navy-900">${l.shift_name}</p>
+                                    <p class="text-slate-500">${l.timestamp} (${l.method})</p>
+                                </div>
+                                <span class="px-2.5 py-1 rounded-full font-semibold ${l.status === 'TEPAT_WAKTU' ? 'bg-pesantren-100 text-pesantren-700' : 'bg-amber-100 text-amber-800'}">${l.status}</span>
+                            </div>
+                        `).join('') : '<p class="text-xs text-slate-400">Belum ada riwayat scan.</p>'}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h5 class="text-xs font-bold uppercase text-navy-900 mb-2">Riwayat Izin & Poskestren</h5>
+                        <div class="space-y-2">
+                            ${studentLeaves.length ? studentLeaves.map(lv => `
+                                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                                    <span class="font-bold text-pesantren-700">${lv.leave_type}</span> (${lv.start_date} s/d ${lv.end_date})
+                                    <p class="text-slate-600 mt-0.5">${lv.reason}</p>
+                                </div>
+                            `).join('') : '<p class="text-xs text-slate-400">Tidak ada izin aktif.</p>'}
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="text-xs font-bold uppercase text-navy-900 mb-2">Pinjaman Inventaris Pondok</h5>
+                        <div class="space-y-2">
+                            ${studentLoans.length ? studentLoans.map(ln => `
+                                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs flex justify-between items-center">
+                                    <div>
+                                        <p class="font-bold text-navy-900">${ln.item_name}</p>
+                                        <p class="text-slate-500">${ln.location}</p>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded font-semibold ${ln.status === 'DIPINJAM' ? 'bg-amber-100 text-amber-800' : 'bg-pesantren-100 text-pesantren-700'}">${ln.status}</span>
+                                </div>
+                            `).join('') : '<p class="text-xs text-slate-400">Tidak ada pinjaman barang.</p>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.onload = async () => {
+            const today = new Date().toISOString().slice(0, 10);
+            document.getElementById('leaveStartDate').value = today;
+            document.getElementById('leaveEndDate').value = today;
+            startRealtimeAccurateClock();
+            detectAccurateLocationAndPrayerTimes();
+            await loadSystemState();
+            selectLoginRole('ADMIN');
+        };
+    </script>
+</body>
+</html>
