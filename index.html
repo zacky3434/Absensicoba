@@ -101,7 +101,7 @@
         }
 
         /* =========================================================
-           2. ANIMASI RADIAL MENU 4 ARAH (SESUAI FRAME 2)
+           2. ANIMASI RADIAL MENU 4 ARAH
            ========================================================= */
         .radial-menu-stage {
             position: relative;
@@ -190,7 +190,7 @@
 <body class="min-h-screen flex flex-col">
 
     <!-- ================================================================= -->
-    <!-- LAYAR 1: TAMPILAN AWAL / SPLASH SCREEN                            -->
+    <!-- LAYAR 1: TAMPILAN AWAL / SPLASH SCREEN (CREDIT BY ZACKY)          -->
     <!-- ================================================================= -->
     <div id="splashScreen" onclick="enterLoginScreenFromSplash()"
          class="fixed inset-0 z-[70] bg-gradient-to-b from-slate-50 via-white to-pesantren-50/40 flex flex-col items-center justify-center p-6 cursor-pointer select-none overflow-hidden screen-transition">
@@ -202,6 +202,7 @@
 
         <div class="relative z-10 max-w-2xl w-full bg-white/95 backdrop-blur-md rounded-[2rem] shadow-2xl border-2 border-slate-200/90 p-8 sm:p-12 text-center flex flex-col items-center space-y-7">
 
+            <!-- Logo PeTIK Jombang | YBM PLN -->
             <div class="inline-flex items-center gap-6 sm:gap-8 bg-slate-50 px-8 py-4 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex flex-col items-center">
                     <svg class="w-20 h-11" viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -241,6 +242,7 @@
                 </div>
             </div>
 
+            <!-- Judul Utama -->
             <div class="space-y-3">
                 <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pesantren-100 border border-pesantren-600/40 text-pesantren-700 text-xs sm:text-sm font-bold">
                     <span class="w-2.5 h-2.5 rounded-full bg-pesantren-600 animate-ping"></span>
@@ -252,12 +254,20 @@
                 </h1>
             </div>
 
+            <!-- Credit by Zacky -->
             <div>
                 <p class="text-sm sm:text-base font-bold text-navy-900 bg-slate-100 px-6 py-2.5 rounded-full border-2 border-slate-300 shadow-sm">
-                    Credit: Developed By <span class="text-pesantren-700 font-extrabold">Zacky</span>
+                    Credit by <span class="text-pesantren-700 font-extrabold">Zacky</span>
                 </p>
             </div>
 
+            <!-- Tombol Masuk -->
+            <div class="pt-2 w-full max-w-md space-y-3">
+                <button type="button" onclick="enterLoginScreenFromSplash(); event.stopPropagation();"
+                    class="w-full py-4 px-8 rounded-2xl bg-navy-900 hover:bg-pesantren-600 text-white font-extrabold text-sm sm:text-base shadow-xl border-2 border-pesantren-500 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-3">
+                    <span>Masuk ke Portal Login Sekarang</span>
+                    <span class="text-lg">→</span>
+                </button>
                 <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-xl bg-pesantren-50 border border-pesantren-500/40">
                     <span class="text-xs sm:text-sm font-bold text-navy-900">
                         👆 Klik di mana saja pada layar untuk melanjutkan
@@ -269,7 +279,7 @@
 
 
     <!-- ================================================================= -->
-    <!-- LAYAR 2: TAMPILAN LOGIN                                           -->
+    <!-- LAYAR 2: TAMPILAN LOGIN (DENGAN CREDIT BY ZACKY)                  -->
     <!-- ================================================================= -->
     <div id="loginScreen" class="fixed inset-0 z-50 bg-slate-100 flex flex-col items-center justify-start overflow-y-auto screen-transition login-initial">
 
@@ -384,6 +394,13 @@
                         </button>
                     </form>
                 </div>
+
+                <!-- Footer Kartu Login: Credit by Zacky -->
+                <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 text-center">
+                    <p class="text-[11px] font-semibold text-slate-600">
+                        SIM-Pontren PeTIK Jombang • <span class="text-navy-900 font-bold">Credit by Zacky</span>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -398,12 +415,15 @@
             <div class="max-w-6xl mx-auto space-y-3">
 
                 <div class="flex flex-wrap justify-between items-center gap-2">
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
                         <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-navy-900 text-white text-xs font-bold shadow-sm">
                             <span>🕌 SIM-Pontren PeTIK Jombang</span>
                         </span>
                         <span id="activeUserBadgeTop" class="text-xs font-bold text-pesantren-700 bg-pesantren-50 border border-pesantren-500/40 px-3.5 py-1.5 rounded-xl">
                             -
+                        </span>
+                        <span class="text-xs font-bold text-navy-900 bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-xl">
+                            Credit by <span class="text-pesantren-700">Zacky</span>
                         </span>
                     </div>
 
@@ -411,6 +431,16 @@
                         <button onclick="detectAccurateLocationAndPrayerTimes()" title="Perbarui GPS & Jadwal Sholat"
                             class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-pesantren-50 text-navy-900 border border-slate-300 text-xs font-semibold transition">
                             📍 Perbarui Lokasi GPS
+                        </button>
+                        <div id="connectionBadge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pesantren-600 text-white text-xs font-bold">
+                            <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                            <span id="connectionText">ONLINE</span>
+                        </div>
+                        <button onclick="toggleOfflineMode()" class="px-3 py-1.5 rounded-xl bg-navy-900 hover:bg-navy-800 text-white text-xs font-semibold transition">
+                            Mode Online/Offline
+                        </button>
+                        <button onclick="syncOfflineQueue()" id="btnSyncOffline" class="hidden px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-navy-900 text-xs font-bold transition">
+                            Sync (<span id="offlineCount">0</span>)
                         </button>
                     </div>
                 </div>
@@ -713,7 +743,6 @@
                 <!-- ADMIN SUB-VIEW 2: JADWAL SHIFT (CRUD) & DATA SANTRI   -->
                 <!-- ===================================================== -->
                 <div id="adminTabSantriShift" class="hidden space-y-6 navbar-content-animate">
-                    <!-- KARTU PENGATURAN JADWAL SHIFT + TABEL DAFTAR SHIFT (EDIT & HAPUS) -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="bg-navy-900 text-white px-6 py-4 flex flex-wrap justify-between items-center gap-2">
                             <div>
@@ -723,7 +752,6 @@
                             <span id="shiftCountBadge" class="bg-pesantren-600 text-white text-xs px-3 py-1 rounded-full font-semibold">0 Shift Aktif</span>
                         </div>
 
-                        <!-- Form Tambah Jadwal Shift Baru -->
                         <form onsubmit="submitNewShift(event)" class="p-6 bg-slate-50/70 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-3 items-end">
                             <div class="lg:col-span-2">
                                 <label class="block text-xs font-semibold text-navy-900 mb-1">Nama Kegiatan / Shift *</label>
@@ -765,7 +793,6 @@
                             </div>
                         </form>
 
-                        <!-- TABEL DAFTAR JADWAL SHIFT KEGIATAN (LENGKAP DENGAN TOMBOL EDIT & HAPUS) -->
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead>
@@ -905,7 +932,6 @@
                         </div>
                     </div>
 
-                    <!-- TABEL DAFTAR SANTRI AKTIF + FITUR EDIT PROFIL & HAPUS SANTRI -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="bg-navy-900 text-white px-6 py-4 flex flex-wrap justify-between items-center gap-2">
                             <div>
@@ -1359,11 +1385,24 @@
 
             </div>
         </main>
+
+        <!-- FOOTER RESMI DENGAN CREDIT BY ZACKY -->
+        <footer class="bg-navy-900 text-white border-t-4 border-pesantren-500 mt-10 py-5 px-4 no-print">
+            <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2.5">
+                    <span class="px-2.5 py-1 rounded-lg bg-pesantren-600 font-bold text-white tracking-wide">SIM-PONTREN</span>
+                    <span class="text-slate-300 font-medium">© 2026 PeTIK II Jombang — YBM PLN</span>
+                </div>
+                <div class="font-semibold text-pesantren-100 bg-navy-800 px-4 py-1.5 rounded-full border border-pesantren-500/40 shadow-sm">
+                    Credit by <span class="text-white font-extrabold">Zacky</span>
+                </div>
+            </div>
+        </footer>
     </div>
 
 
     <!-- ================================================================= -->
-    <!-- MODAL EDIT JADWAL SHIFT KEGIATAN (BARU)                           -->
+    <!-- MODAL EDIT JADWAL SHIFT KEGIATAN                                  -->
     <!-- ================================================================= -->
     <div id="editShiftModal" class="fixed inset-0 z-[75] hidden bg-navy-950/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl shadow-2xl border-2 border-pesantren-500 max-w-lg w-full overflow-hidden">
@@ -1903,7 +1942,7 @@
         }
 
         // =========================================================
-        // 5. FITUR BARU: EDIT & HAPUS JADWAL SHIFT KEGIATAN
+        // 5. EDIT & HAPUS JADWAL SHIFT KEGIATAN
         // =========================================================
         async function submitNewShift(e) {
             e.preventDefault();
@@ -2503,7 +2542,6 @@
             document.getElementById('scanShiftId').innerHTML = shiftOptions;
             document.getElementById('ustadzShiftId').innerHTML = shiftOptions;
 
-            // Render Tabel Daftar Jadwal Shift Kegiatan (Lengkap dengan Tombol Edit & Hapus)
             document.getElementById('shiftsMasterTableBody').innerHTML = appState.shifts.length
                 ? appState.shifts.map(sh => `
                     <tr class="hover:bg-slate-50">
@@ -2553,7 +2591,6 @@
             syncSelectedStudentPin('admin');
             syncSelectedStudentPin('ustadz');
 
-            // Render Tabel Master Santri + Tombol Edit Profil & Hapus Santri
             document.getElementById('studentsMasterTableBody').innerHTML = appState.students.length
                 ? appState.students.map(s => `
                     <tr class="hover:bg-slate-50">
@@ -2582,7 +2619,6 @@
                 `).join('')
                 : `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Belum ada data santri. Tambahkan manual atau gunakan Import Excel (.xlsx) di atas.</td></tr>`;
 
-            // Render Tabel AI Early Warning (Murni dari Input Manual BK)
             document.getElementById('aiEarlyWarningTable').innerHTML = appState.bk_records.length
                 ? appState.bk_records.map(r => {
                     const badgeColor = r.risk_score >= 70
@@ -2609,7 +2645,6 @@
                 }).join('')
                 : `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Riwayat Bimbingan Konseling (AI Early Warning) masih kosong. Silakan isi form di atas untuk membuat catatan secara manual dari awal.</td></tr>`;
 
-            // Tabel Log Kehadiran
             document.getElementById('attendanceTableBody').innerHTML = appState.logs.length
                 ? appState.logs.map(l => {
                     const statusBadge = l.status === 'TEPAT_WAKTU'
@@ -2629,7 +2664,6 @@
                 }).join('')
                 : `<tr><td colspan="7" class="py-6 text-center text-xs text-slate-400">Belum ada catatan log kehadiran.</td></tr>`;
 
-            // Log WhatsApp
             document.getElementById('waLogsContainer').innerHTML = appState.wa_logs.length
                 ? appState.wa_logs.map(w => `
                     <div class="bg-white p-3 rounded-xl border border-pesantren-100 shadow-sm text-xs space-y-1">
@@ -2642,7 +2676,6 @@
                 `).join('')
                 : `<p class="text-xs text-slate-400 text-center py-8">Belum ada notifikasi WhatsApp yang dikirim.</p>`;
 
-            // Tabel Inventaris
             document.getElementById('inventoryTableBody').innerHTML = appState.loans.length
                 ? appState.loans.map(ln => `
                     <tr class="hover:bg-slate-50">
